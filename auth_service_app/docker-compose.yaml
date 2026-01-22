@@ -1,0 +1,51 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    environment:
+      MYSQL_HOST: auth-service-database
+      MYSQL_DATABASE: auth_service_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD}
+      OTEL_EXPORTER_LOGS_ENDPOINT: "http://otel-collector:4318/v1/logs"
+      OTEL_EXPORTER_TRACES_ENDPOINT: "http://otel-collector:4318/v1/traces"
+      OTEL_EXPORTER_METRICS_ENDPOINT: "http://otel-collector:4318/v1/metrics"
+      OTEL_SERVICE_NAME: "auth-service"
+      METRICS_MOUNT_PATH: "/metrics"
+      ATTACH_PYTHON_LOGGING: "true"
+      LOG_LEVEL: "INFO"
+      LOGGING_BACKEND: "${LOGGING_BACKEND:-loki}"
+      TRACING_BACKEND: "${TRACING_BACKEND:-tempo}"
+      METRICS_BACKEND: "${METRICS_BACKEND:-prometheus}"
+      RATE_LIMITED_LOG_INTERVAL_SECONDS: 5
+    depends_on:
+      auth-service-database:
+        condition: service_healthy
+      auth-service-liquibase:
+        condition: service_started
+    healthcheck:
+      test: curl --fail http://localhost:5001/app_health || exit 1
+      start_period: 10s
+      interval: 20s
+    networks:
+      - auth-service-api-network
+
+  smoke-tests:
+    build:
+      context: ./smoke_tests
+      dockerfile: Dockerfile
+    container_name: auth-service-smoke-tests
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      auth-service-liquibase:
+        condition: service_completed_successfully
+    environment:
+      BASE_URL: http://auth-service:5001
+    networks:
+      - auth-service-api-network
+

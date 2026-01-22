@@ -1,7 +1,0 @@
-include:
-  - path:
-      - ./auth_service_db/docker-compose.yaml
-
-networks:
-    auth-service-api-network:
-        name: auth-service-api-network
