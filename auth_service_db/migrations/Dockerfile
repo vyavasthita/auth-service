@@ -1,0 +1,22 @@
+FROM liquibase/liquibase:4.31-alpine
+
+RUN lpm add mysql --global
+
+ARG LIQUIBASE_LOG_LEVEL
+ARG MYSQL_HOST
+ARG MYSQL_DATABASE
+ARG MYSQL_PORT
+ARG MYSQL_USER
+ARG MYSQL_PASSWORD
+
+ENV LIQUIBASE_LOG_LEVEL=${LIQUIBASE_LOG_LEVEL}
+ENV LIQUIBASE_COMMAND_USERNAME=${MYSQL_USER}
+ENV LIQUIBASE_COMMAND_PASSWORD=${MYSQL_PASSWORD}
+ENV LIQUIBASE_COMMAND_CHANGELOG_FILE=changelog/changelog.yaml
+ENV LIQUIBASE_COMMAND_URL="jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?createDatabaseIfNotExist=true"
+
+COPY changelog/ /liquibase/changelog
+WORKDIR /liquibase
+
+# Set default command to run liquibase update
+CMD ["update"]

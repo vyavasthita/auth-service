@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: ./tables/changelog-table.yaml
+      relativeToChangelogFile: true
