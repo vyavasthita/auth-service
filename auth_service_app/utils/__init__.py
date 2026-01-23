@@ -1,3 +1,3 @@
 from .auth_service_logger import AuthServiceLogger
-from .auth_token import generate_auth_token
-from .password_utils import hash_password, verify_password
+from .security import hash_password, verify_password
+from .jwt_utils import generate_jwt_token, verify_jwt_token
