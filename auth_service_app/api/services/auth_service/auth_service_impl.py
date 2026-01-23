@@ -3,7 +3,7 @@ from functools import wraps
 from uuid import uuid4
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from utils import generate_auth_token, hash_password, verify_password
+from api.utils import Security, JWTUtils
 from api.exceptions import (
     InvalidCredentialsException,
 )
@@ -29,14 +29,10 @@ class AuthServiceImpl(AuthService):
         password: str,
         phone_number: str,
     ) -> User:
-        user = User()
-
-        user.id = uuid4().bytes
-        user.name = name
-        user.email = email
-        user.password = hash_password(password)
-        user.phone_number = phone_number
-
+        user = User(id=uuid4().bytes, name=name, email=email,
+                    password=Security.hash_password(password),
+                    phone_number=phone_number)
+        
         return await self.auth_repository.save(db_session, user)
 
     @AuthService.is_valid_user
@@ -47,7 +43,6 @@ class AuthServiceImpl(AuthService):
         password: str,
         user: User,  # Filled by the is_valid_user decorator
     ) -> str:
-        if not verify_password(password, user.password):
+        if not Security.verify_password(password, user.password):
             raise InvalidCredentialsException()
-        
-        return generate_auth_token()
+        return JWTUtils.generate_auth_token({"sub": user.email})

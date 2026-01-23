@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from utils import AuthServiceLogger
+from api.utils import AuthServiceLogger
 from api.dtos import (
     RegisterUserRequestDTO,
     RegisterUserResponseDTO,
@@ -37,7 +37,7 @@ class AuthController:
     ) -> RegisterUserResponseDTO:
         self.logger.info(f"Register endpoint called for email: {request.email}")
         user: User = await auth_service.register(
-            db_session,
+            db_session=db_session,
             name=request.name,
             email=request.email,
             password=request.password,

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
+from api.repositories.db import BaseDB
+from fastapi import FastAPI
 from api.dependencies import Config
-from api.repositories.db import register_db_shutdown_event
 
 
 class AppFactory:
@@ -21,6 +22,10 @@ class AppFactory:
             docs_url=Config().OPEN_API_DOCS_URL if Config().ENABLE_SWAGGER_UI else None,
             redoc_url=Config().OPEN_API_RE_DOC_URL if Config().ENABLE_SWAGGER_UI else None,
         )
-        # Register DB shutdown event handler
-        register_db_shutdown_event(app)
+
+        # Register DB shutdown event handler directly here
+        @app.on_event("shutdown")
+        async def _shutdown_db_engine():
+            await BaseDB().dispose_engine()
+
         return app

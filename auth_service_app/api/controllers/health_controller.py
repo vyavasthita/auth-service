@@ -1,6 +1,6 @@
-from utils.auth_service_logger import AuthServiceLogger
 from fastapi import APIRouter, Depends
 from instrumentation_hub_fastapi import rate_limited_log
+from api.utils import AuthServiceLogger
 from api.dependencies.db_dependency import ValidateDBConnection
 from api.dependencies.config_dependency import Config
 
