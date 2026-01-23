@@ -10,10 +10,11 @@ package-mode = false
 python = ">=3.13,<3.14"  # Python runtime version
 pydantic-settings = "^2.7.1"  # Settings management using Pydantic
 # TEMP: Use development branch for instrumentation-hub-fastapi
-instrumentation-hub-fastapi = { git = "https://github.com/vyavasthita/instrumentation-hub.git", rev = "development", subdirectory = "packages/python/fastapi" }
+instrumentation-hub-fastapi = { git = "https://github.com/vyavasthita/instrumentation-hub.git", rev = "master", subdirectory = "packages/python/fastapi" }
 sqlalchemy = "^2.0.45"
 aiomysql = "^0.3.2"
 email-validator = "^2.2.0"
+bcrypt = "^5.0.0"
 
 [tool.poetry.group.core.dependencies]
 fastapi = "^0.115.8"  # FastAPI web framework

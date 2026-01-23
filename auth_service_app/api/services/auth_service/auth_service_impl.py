@@ -1,58 +1,26 @@
 import secrets
 from functools import wraps
-from typing import Any, Callable, Optional
 from uuid import uuid4
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils import generate_auth_token, hash_password, verify_password
 from api.exceptions import (
     InvalidCredentialsException,
-    UserAlreadyExistsException,
-    UserNotFoundException,
 )
 from api.models import User
 from api.repositories import AuthRepository, AuthRepositoryImpl
 from .auth_service import AuthService
 
 
-def is_user_exist(func: Callable[..., Any]) -> Callable[..., Any]:
-    @wraps(func)
-    async def wrapper(
-        self,
-        db_session: AsyncSession,
-        email: str,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Any:
-        user: Optional[User] = await self.auth_repository.find_by_email(
-            db_session,
-            email=email,
-        )
-        if user is None:
-            raise UserNotFoundException(email)
-
-        kwargs.setdefault("user", user)
-        return await func(self, db_session, email, *args, **kwargs)
-
-    return wrapper
-
-
 class AuthServiceImpl(AuthService):
+
     def __init__(
         self,
         auth_repository: AuthRepository = Depends(AuthRepositoryImpl),
     ):
         super().__init__(auth_repository)
-
-    async def __is_user_exists(self, db_session: AsyncSession, email: str) -> bool:
-        user: Optional[User] = await self.auth_repository.find_by_email(
-            db_session,
-            email=email,
-        )
-        return user is not None
-
-    def _generate_auth_token(self) -> str:
-        return secrets.token_urlsafe(32)
-
+    
+    @AuthService.is_new_user
     async def register(
         self,
         db_session: AsyncSession,
@@ -61,32 +29,25 @@ class AuthServiceImpl(AuthService):
         password: str,
         phone_number: str,
     ) -> User:
-        if await self.__is_user_exists(db_session, email=email):
-            raise UserAlreadyExistsException(email=email)
-
         user = User()
 
         user.id = uuid4().bytes
         user.name = name
         user.email = email
-        user.password = password
+        user.password = hash_password(password)
         user.phone_number = phone_number
 
         return await self.auth_repository.save(db_session, user)
 
-    @is_user_exist
+    @AuthService.is_valid_user
     async def login(
         self,
-        db_session: AsyncSession,
-        email: str,
+        db_session: AsyncSession,  # Automatically passed to the is_valid_user decorator
+        email: str,  # Automatically passed to the is_valid_user decorator
         password: str,
-        *,
-        user: Optional[User] = None,
+        user: User,  # Filled by the is_valid_user decorator
     ) -> str:
-        if user is None:
-            raise UserNotFoundException(email)
-
-        if user.password != password:
+        if not verify_password(password, user.password):
             raise InvalidCredentialsException()
-
-        return self._generate_auth_token()
+        
+        return generate_auth_token()

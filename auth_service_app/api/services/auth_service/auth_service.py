@@ -2,9 +2,40 @@ from abc import ABC, abstractmethod
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.models import User
 from api.repositories import AuthRepository
-
+from api.exceptions import (
+    UserAlreadyExistsException,
+    UserNotFoundException,
+)
 
 class AuthService(ABC):
+    async def _check_user(self, db_session: AsyncSession, email: str) -> User | None:
+        return await self.auth_repository.find_by_email(db_session, email=email)
+
+    @staticmethod
+    def is_new_user(func):
+        from functools import wraps
+        @wraps(func)
+        async def wrapper(self, db_session: AsyncSession, email: str):
+            user = await self._check_user(db_session, email)
+            if user is not None:
+                from api.exceptions import UserAlreadyExistsException
+                raise UserAlreadyExistsException(email=email)
+            return await func(self, db_session, email)
+        return wrapper
+
+    @staticmethod
+    def is_valid_user(func):
+        from functools import wraps
+        @wraps(func)
+        async def wrapper(self, db_session: AsyncSession, email: str, **kwargs):
+            user = await self._check_user(db_session, email)
+            if user is None:
+                from api.exceptions import UserNotFoundException
+                raise UserNotFoundException(email=email)
+            kwargs['user'] = user
+            return await func(self, db_session, email, **kwargs)
+        return wrapper
+
     def __init__(self, auth_repository: AuthRepository):
         self._auth_repository = auth_repository
 
