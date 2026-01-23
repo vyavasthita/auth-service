@@ -663,7 +663,7 @@ pydantic-settings = ">=2.12.0,<3.0.0"
 type = "git"
 url = "https://github.com/vyavasthita/instrumentation-hub.git"
 reference = "development"
-resolved_reference = "eab7db2349e97844e550840dcac803941927d7ee"
+resolved_reference = "a08d4726f2c720a84cba7268b3e88b96dd8204e1"
 subdirectory = "packages/python/fastapi"
 
 [[package]]

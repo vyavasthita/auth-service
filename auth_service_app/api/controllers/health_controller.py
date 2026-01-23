@@ -1,4 +1,4 @@
-import logging
+from utils.auth_service_logger import AuthServiceLogger
 from fastapi import APIRouter, Depends
 from instrumentation_hub_fastapi import rate_limited_log
 from api.dependencies.db_dependency import ValidateDBConnection
@@ -19,7 +19,7 @@ class HealthController:
             methods=["GET"],
             dependencies=[Depends(ValidateDBConnection())],
         )
-        self.logger = logging.getLogger(__name__)
+        self.logger = AuthServiceLogger.get_logger()
 
     @rate_limited_log(interval_seconds=Config().RATE_LIMITED_LOG_INTERVAL_SECONDS)
     async def health_check(self) -> str:

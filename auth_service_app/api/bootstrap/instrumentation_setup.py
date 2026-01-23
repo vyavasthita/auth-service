@@ -3,6 +3,8 @@ from instrumentation_hub_fastapi import FastAPIInstrumentation
 from instrumentation_hub_fastapi.middlewares.api_instrumentation import (
     InstrumentationSanitizationConfig, InstrumentationConfigFactory, MetricType
 )
+from api.dependencies import Config
+
 
 class InstrumentationSetup:
     """
@@ -36,7 +38,10 @@ class InstrumentationSetup:
         Args:
             app: FastAPI app instance
         """
-        config = InstrumentationSetup._get_metrics_config()
-        sanitization = InstrumentationSetup._get_sanitization_config()
-
-        FastAPIInstrumentation().setup(app, metrics_config=config, sanitization_config=sanitization)
+        FastAPIInstrumentation().setup(
+            app,
+            metrics_config=InstrumentationSetup._get_metrics_config(),
+            sanitization_config=InstrumentationSetup._get_sanitization_config(),
+            service_name=Config().OTEL_SERVICE_NAME,
+            log_level=Config().LOG_LEVEL
+        )

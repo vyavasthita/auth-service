@@ -14,6 +14,7 @@ services:
       - auth-service-database_data:/var/lib/mysql
     networks:
       - auth-service-api-network
+      - observability
 
   auth-service-liquibase:
     container_name: auth-service-liquibase
@@ -40,6 +41,7 @@ services:
       - ./migrations/changelog:/liquibase/changelog
     networks:
       - auth-service-api-network
+      - observability
 
 volumes:
   auth-service-database_data:

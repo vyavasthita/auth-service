@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from api.dependencies import Config
+from api.repositories.db import register_db_shutdown_event
 
 
 class AppFactory:
     @staticmethod
     def create_app() -> FastAPI:
-        return FastAPI(
+        app = FastAPI(
             title="Auth Service",
             summary="Authentication and Authorisation service",
             description=(
@@ -20,3 +21,6 @@ class AppFactory:
             docs_url=Config().OPEN_API_DOCS_URL if Config().ENABLE_SWAGGER_UI else None,
             redoc_url=Config().OPEN_API_RE_DOC_URL if Config().ENABLE_SWAGGER_UI else None,
         )
+        # Register DB shutdown event handler
+        register_db_shutdown_event(app)
+        return app

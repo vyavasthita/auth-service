@@ -33,6 +33,7 @@ services:
       interval: 20s
     networks:
       - auth-service-api-network
+      - observability
 
   smoke-tests:
     build:
@@ -48,4 +49,5 @@ services:
       BASE_URL: http://auth-service:5001
     networks:
       - auth-service-api-network
+      - observability
 
