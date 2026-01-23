@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-from api.repositories.db import BaseDB
 from fastapi import FastAPI
 from api.dependencies import Config
-
+from api.repositories.db import BaseDB
 
 class AppFactory:
     @staticmethod
