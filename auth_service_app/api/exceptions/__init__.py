@@ -4,5 +4,6 @@ from .user_exception import (
 	InvalidCredentialsException,
 	UserAlreadyExistsException,
 	UserNotFoundException,
+    EmailFormatException,
 )
 from ..exceptions.exception_handlers import register_exception_handlers

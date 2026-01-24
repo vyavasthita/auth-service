@@ -4,6 +4,7 @@ from uuid import uuid4
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.utils import Security, JWTUtils
+from api.utils.email_validator import email_format_validator, EmailFormatException
 from api.exceptions import (
     InvalidCredentialsException,
 )
@@ -20,6 +21,7 @@ class AuthServiceImpl(AuthService):
     ):
         super().__init__(auth_repository)
     
+    @email_format_validator
     @AuthService.is_new_user
     async def register(
         self,
@@ -38,6 +40,7 @@ class AuthServiceImpl(AuthService):
         
         return await self.auth_repository.save(db_session, user)
 
+    @email_format_validator
     @AuthService.is_valid_user
     async def login(
         self,

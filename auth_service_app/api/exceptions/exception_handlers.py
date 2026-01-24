@@ -6,6 +6,7 @@ from api.exceptions import (
     InvalidCredentialsException,
     UserAlreadyExistsException,
     UserNotFoundException,
+    EmailFormatException,
 )
 
 
@@ -41,6 +42,16 @@ def register_exception_handlers(app: FastAPI):
             content={"message": exc.message},
         )
 
+    @app.exception_handler(EmailFormatException)
+    async def email_format_exception_handler(
+        request: Request,
+        exc: EmailFormatException,
+    ):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"message": exc.message},
+        )
+    
     # Handle FastAPI HTTPException
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):

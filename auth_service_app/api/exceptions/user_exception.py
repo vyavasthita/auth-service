@@ -1,3 +1,4 @@
+
 from fastapi import status
 from .base_exception import BaseException
 
@@ -16,3 +17,7 @@ class UserAlreadyExistsException(BaseException):
 class InvalidCredentialsException(BaseException):
     def __init__(self) -> None:
         super().__init__(status.HTTP_401_UNAUTHORIZED, "Invalid email or password.")
+
+class EmailFormatException(BaseException):
+    def __init__(self, email: str):
+        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Email '{email}' is invalid")
