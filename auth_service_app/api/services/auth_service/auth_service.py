@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from functools import wraps
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.models import User
 from api.repositories import AuthRepository
@@ -13,7 +14,6 @@ class AuthService(ABC):
 
     @staticmethod
     def is_new_user(func):
-        from functools import wraps
         @wraps(func)
         async def wrapper(self, db_session: AsyncSession, email: str, *args, **kwargs):
             user = await self._check_user(db_session, email)
@@ -27,11 +27,10 @@ class AuthService(ABC):
 
     @staticmethod
     def is_valid_user(func):
-        from functools import wraps
         @wraps(func)
         async def wrapper(self, db_session: AsyncSession, email: str, **kwargs):
             user = await self._check_user(db_session, email)
-            
+
             if user is None:
                 from api.exceptions import UserNotFoundException
                 raise UserNotFoundException(email=email)

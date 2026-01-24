@@ -26,7 +26,7 @@ class InstrumentationSetup:
         Returns the InstrumentationSanitizationConfig for sensitive fields and max length.
         """
         return InstrumentationSanitizationConfig(
-            sensitive_fields={'password', 'token', 'api_key', 'ssn'},
+            sensitive_fields={'password', 'token', 'api_key', 'ssn', 'phone_number'},
             max_field_length=64
         )
     
