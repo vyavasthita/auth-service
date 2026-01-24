@@ -29,9 +29,12 @@ class AuthServiceImpl(AuthService):
         password: str,
         phone_number: str,
     ) -> User:
-        user = User(id=uuid4().bytes, name=name, email=email,
-                    password=Security.hash_password(password),
-                    phone_number=phone_number)
+        user = User()
+        user.id = uuid4().bytes
+        user.name = name
+        user.email = email
+        user.password = Security.hash_password(password)
+        user.phone_number = phone_number
         
         return await self.auth_repository.save(db_session, user)
 

@@ -172,21 +172,27 @@ README: |
 
   ### Running Locally
 
+    Before running the service, export the MySQL root password environment variable:
+
     ```bash
-    cp .env.example .env
+    export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
     docker-compose up --build
     ```
 
+
   Service will be available at:
+
+  - http://localhost:5001/auth-service
 
 
 ---
 
 ## API Endpoints
 
-- `POST /api/v1/auth/login`
-- `POST /api/v1/auth/token`
-- `GET /api/v1/health`
+- `POST /auth-service/login`
+- `POST /auth-service/register`
+- `GET /auth-service/app_health`
+- `GET /auth-service/db_health`
 
 ---
 
@@ -195,7 +201,7 @@ README: |
 The project includes unit and integration tests.
 
   ```bash
-  pytest
+  make test
   ```
 
 ---
@@ -203,7 +209,6 @@ The project includes unit and integration tests.
 ## Deployment
 
 - Production-ready Docker image
-- Helm chart included for Kubernetes deployment
 - Configuration via environment variables
 - Designed for horizontal scaling and zero-downtime deployments
 
@@ -229,14 +234,14 @@ It is intended as a reference implementation of a production-grade authenticatio
 
 ## Author
 
-Your Name  
+Dilip Kumar Sharma 
 Backend Engineer | Distributed Systems | Observability | Security
 
 ---
 
 ## License
 
-Copyright © 2026 Your Name
+Copyright © 2026 Dilip Kumar Sharma
 
 All rights reserved.
 

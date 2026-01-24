@@ -15,12 +15,14 @@ class AuthService(ABC):
     def is_new_user(func):
         from functools import wraps
         @wraps(func)
-        async def wrapper(self, db_session: AsyncSession, email: str):
+        async def wrapper(self, db_session: AsyncSession, email: str, *args, **kwargs):
             user = await self._check_user(db_session, email)
+
             if user is not None:
                 from api.exceptions import UserAlreadyExistsException
                 raise UserAlreadyExistsException(email=email)
-            return await func(self, db_session, email)
+            return await func(self, db_session, email, *args, **kwargs)
+        
         return wrapper
 
     @staticmethod
@@ -29,6 +31,7 @@ class AuthService(ABC):
         @wraps(func)
         async def wrapper(self, db_session: AsyncSession, email: str, **kwargs):
             user = await self._check_user(db_session, email)
+            
             if user is None:
                 from api.exceptions import UserNotFoundException
                 raise UserNotFoundException(email=email)
