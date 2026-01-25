@@ -50,6 +50,7 @@ class AuthServiceImpl(AuthService):
         return await self.auth_repository.save(db_session, user)
 
     @email_format_validator
+    @AuthService.is_valid_user
     async def login(
         self,
         db_session: AsyncSession,
@@ -58,14 +59,6 @@ class AuthServiceImpl(AuthService):
     ) -> str:
         """
         Authenticate a user and return a JWT token.
-        Checks for user existence and password validity.
+        User existence and password validity are checked by the decorator.
         """
-        user: User = await self._check_user(db_session, email)
-
-        if not user:
-            raise UserNotFoundException(email=email)
-        
-        if not Security.verify_password(password, user.password):
-            raise InvalidCredentialsException()
-        
-        return JWTUtils.generate_auth_token({"sub": user.email})
+        return JWTUtils.generate_auth_token({"sub": email})

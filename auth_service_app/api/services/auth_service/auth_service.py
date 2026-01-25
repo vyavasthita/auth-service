@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from functools import wraps
 from sqlalchemy.ext.asyncio import AsyncSession
+from api.utils import Security
 from api.models import User
 from api.repositories import AuthRepository
 from api.exceptions import (
     UserAlreadyExistsException,
     UserNotFoundException,
+    InvalidCredentialsException,
 )
 
 class AuthService(ABC):
@@ -36,6 +38,7 @@ class AuthService(ABC):
 
             if user is not None:
                 raise UserAlreadyExistsException(email=email)
+            
             return await func(self, db_session, email, *args, **kwargs)
         
         return wrapper
@@ -43,16 +46,20 @@ class AuthService(ABC):
     @staticmethod
     def is_valid_user(func):
         """
-        Decorator to ensure the user exists before login.
+        Decorator to ensure the user exists and password is valid before login.
         """
         @wraps(func)
-        async def wrapper(self, db_session: AsyncSession, email: str, **kwargs):
+        async def wrapper(self, db_session: AsyncSession, email: str, password: str):
             user = await self._check_user(db_session, email)
 
             if user is None:
                 raise UserNotFoundException(email=email)
-            kwargs['user'] = user
-            return await func(self, db_session, email, **kwargs)
+            
+            if not Security.verify_password(password, user.password):
+                raise InvalidCredentialsException()
+            
+            return await func(self, db_session, email, password)
+        
         return wrapper
 
     def __init__(self, auth_repository: AuthRepository):
