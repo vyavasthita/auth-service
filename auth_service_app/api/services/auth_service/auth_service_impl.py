@@ -1,12 +1,10 @@
 from uuid import uuid4
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timedelta, timezone
+from api.dependencies import Config
 from api.utils import Security, JWTUtils
 from api.utils.email_validator import email_format_validator
-from api.exceptions import (
-    InvalidCredentialsException,
-    UserNotFoundException,
-)
 from api.models import User
 from api.repositories import AuthRepository, AuthRepositoryImpl
 from .auth_service import AuthService
@@ -61,4 +59,8 @@ class AuthServiceImpl(AuthService):
         Authenticate a user and return a JWT token.
         User existence and password validity are checked by the decorator.
         """
-        return JWTUtils.generate_auth_token({"sub": email})
+        expire = datetime.now(timezone.utc) + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
+
+        claims = {"sub": email, "exp": expire}
+
+        return JWTUtils.generate_auth_token(claims=claims)

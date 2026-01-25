@@ -50,6 +50,11 @@ class OpenAPISettings(BaseModel):
     OPEN_API_DOCS_URL: Optional[str] | None = "/docs"
     OPEN_API_RE_DOC_URL: Optional[str] | None = "/redoc"
 
+class JWTSettings(BaseModel):
+    SECRET_KEY: str = "auth-service-secret"  # Replace with env/config in production
+    ALGORITHM: str = "HS256"
+    TOKEN_EXPIRE_MINUTES: int = 10
+
 class OtherSettings(BaseModel):
     LOG_LEVEL: str = "INFO"
 
@@ -62,11 +67,12 @@ class OtherSettings(BaseModel):
         return value
 
 class Settings(
+    BaseSettings,
     MySQLSettings, 
     ObservabilitySettings, 
     CORSSettings, 
     OpenAPISettings, 
-    OtherSettings, 
-    BaseSettings):
+    JWTSettings,
+    OtherSettings):
     """Application settings, composed from multiple config classes."""
     pass

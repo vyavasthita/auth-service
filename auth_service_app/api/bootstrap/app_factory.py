@@ -12,6 +12,13 @@ class AppFactory:
         Returns:
             FastAPI: The configured FastAPI application.
         """
+        from contextlib import asynccontextmanager
+
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            yield
+            await BaseDB().dispose_engine()
+
         app = FastAPI(
             title="Auth Service",
             summary="Authentication and Authorisation service",
@@ -26,11 +33,7 @@ class AppFactory:
             root_path="/auth-service",
             docs_url=Config().OPEN_API_DOCS_URL if Config().ENABLE_SWAGGER_UI else None,
             redoc_url=Config().OPEN_API_RE_DOC_URL if Config().ENABLE_SWAGGER_UI else None,
+            lifespan=lifespan
         )
-
-        # Register DB shutdown event handler directly here
-        @app.on_event("shutdown")
-        async def _shutdown_db_engine():
-            await BaseDB().dispose_engine()
 
         return app

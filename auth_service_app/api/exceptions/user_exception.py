@@ -10,6 +10,7 @@ class UserNotFoundException(BaseException):
 
 class UserAlreadyExistsException(BaseException):
     def __init__(self, email: str):
+        self.email = email
         super().__init__(status.HTTP_409_CONFLICT, f"User with '{email}' already exists.")
 
 

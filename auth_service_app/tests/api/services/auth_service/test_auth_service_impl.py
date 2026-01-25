@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.exceptions.user_exception import InvalidCredentialsException, UserNotFoundException
 from api.models import User
 from auth_service_app.api.services import AuthServiceImpl
+from api.utils.security import Security
 
 
 @pytest.mark.asyncio
@@ -14,8 +15,9 @@ async def test_auth_service_impl_import():
 @pytest.mark.asyncio
 async def test_login_success_returns_token():
     user = User()
-    user.email = "test@example.com"
-    user.password = "secret"
+    user.email = "test@gmail.com"
+    # Use a valid bcrypt hash for the password
+    user.password = Security.hash_password("secret")
 
     mock_repo = MagicMock()
     mock_repo.find_by_email = AsyncMock(return_value=user)
@@ -24,7 +26,7 @@ async def test_login_success_returns_token():
 
     token = await service.login(
         MagicMock(spec=AsyncSession),
-        email="test@example.com",
+        email="test@gmail.com",
         password="secret",
     )
 
@@ -36,8 +38,9 @@ async def test_login_success_returns_token():
 @pytest.mark.asyncio
 async def test_login_invalid_password_raises():
     user = User()
-    user.email = "test@example.com"
-    user.password = "secret"
+    user.email = "test@gmail.com"
+    # Use a valid bcrypt hash for the password
+    user.password = Security.hash_password("secret")
 
     mock_repo = MagicMock()
     mock_repo.find_by_email = AsyncMock(return_value=user)
@@ -47,7 +50,7 @@ async def test_login_invalid_password_raises():
     with pytest.raises(InvalidCredentialsException):
         await service.login(
             MagicMock(spec=AsyncSession),
-            email="test@example.com",
+            email="test@gmail.com",
             password="wrong",
         )
 
@@ -62,6 +65,6 @@ async def test_login_user_not_found_raises():
     with pytest.raises(UserNotFoundException):
         await service.login(
             MagicMock(spec=AsyncSession),
-            email="missing@example.com",
+            email="missing@gmail.com",
             password="secret",
         )
