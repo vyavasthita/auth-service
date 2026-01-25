@@ -40,12 +40,13 @@ class AuthServiceImpl(AuthService):
         Register a new user in the system.
         Checks for existing user before creating.
         """
-        user = User()
-        user.id = uuid4().bytes
-        user.name = name
-        user.email = email
-        user.password = Security.hash_password(password)
-        user.phone_number = phone_number
+
+        user = User(id=uuid4().bytes,
+                    name=name,
+                    email=email,
+                    password=Security.hash_password(password),
+                    phone_number=phone_number)
+        
         return await self.auth_repository.save(db_session, user)
 
     @email_format_validator
@@ -60,8 +61,11 @@ class AuthServiceImpl(AuthService):
         Checks for user existence and password validity.
         """
         user: User = await self._check_user(db_session, email)
+
         if not user:
             raise UserNotFoundException(email=email)
+        
         if not Security.verify_password(password, user.password):
             raise InvalidCredentialsException()
+        
         return JWTUtils.generate_auth_token({"sub": user.email})
