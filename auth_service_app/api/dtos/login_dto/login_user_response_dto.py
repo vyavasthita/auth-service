@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class LoginUserResponseDTO(BaseModel):
+    # DTO for user login response payload containing the access token.
     access_token: str = Field(
         description="Bearer token issued after successful authentication.",
     )

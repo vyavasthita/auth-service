@@ -4,14 +4,17 @@ from api.dependencies import Config
 
 
 class AuthServiceLogger:
-    """
-    Singleton logger for the Auth Service. Use AuthServiceLogger.get_logger() to get the logger instance.
-    """
     _instance = None
     _lock = Lock()
 
     @classmethod
     def get_logger(cls) -> logging.Logger:
+        """
+        Get the singleton logger instance for the Auth Service.
+
+        Returns:
+            logging.Logger: The logger instance.
+        """
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:

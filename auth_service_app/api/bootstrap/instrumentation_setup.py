@@ -33,10 +33,12 @@ class InstrumentationSetup:
     @staticmethod
     def setup(app: FastAPI):
         """
-        Set up instrumentation for FastAPI app with internal metrics and sanitization config.
+        Set up instrumentation for the FastAPI application.
+
+        This may include tracing, metrics, and logging configuration.
 
         Args:
-            app: FastAPI app instance
+            app (FastAPI): The FastAPI application to instrument.
         """
         FastAPIInstrumentation().setup(
             app,

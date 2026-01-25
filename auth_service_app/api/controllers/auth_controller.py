@@ -15,6 +15,9 @@ from api.services import AuthService, AuthServiceImpl
 
 class AuthController:
     def __init__(self):
+        """
+        Initialize the AuthController with API routes for user registration and login, and a logger.
+        """
         self.router = APIRouter(tags=["Auth"])
         self.logger = AuthServiceLogger.get_logger()
         self.router.add_api_route(
@@ -35,11 +38,14 @@ class AuthController:
         db_session: AsyncSession = Depends(get_db_session),
         auth_service: AuthService = Depends(AuthServiceImpl),
     ) -> RegisterUserResponseDTO:
+        """
+        Register a new user.
+        """
         self.logger.info(f"Register endpoint called for email: {request.email}")
         user: User = await auth_service.register(
             db_session=db_session,
-            name=request.name,
             email=request.email,
+            name=request.name,
             password=request.password,
             phone_number=request.phone_number,
         )
@@ -56,9 +62,12 @@ class AuthController:
         db_session: AsyncSession = Depends(get_db_session),
         auth_service: AuthService = Depends(AuthServiceImpl),
     ) -> LoginUserResponseDTO:
+        """
+        Authenticate a user and return an access token.
+        """
         self.logger.info(f"Login endpoint called for email: {request.email}")
         token: str = await auth_service.login(
-            db_session,
+            db_session=db_session,
             email=request.email,
             password=request.password,
         )

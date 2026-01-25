@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 
+
 @dataclass
 class BaseException(Exception):
     status_code: int

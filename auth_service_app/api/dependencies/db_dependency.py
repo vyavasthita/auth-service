@@ -14,6 +14,12 @@ _session_local = async_sessionmaker(bind=_engine, expire_on_commit=False)
 
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency that provides a SQLAlchemy AsyncSession for database operations.
+
+    Yields:
+        AsyncSession: The database session.
+    """
     logger = logging.getLogger(__name__)
     
     async with _session_local() as db:
@@ -29,6 +35,15 @@ class ValidateDBConnection:
     logger = logging.getLogger(__name__)
 
     async def _validate(self, db: AsyncSession) -> None:
+        """
+        Validates the database connection by executing a test query.
+
+        Args:
+            db (AsyncSession): The database session to validate.
+
+        Raises:
+            DBConnectionException: If the database check fails.
+        """
         try:
             statement = text(
                 "SELECT table_name FROM information_schema.tables WHERE table_schema = :schema"
@@ -44,5 +59,11 @@ class ValidateDBConnection:
             )
 
     async def __call__(self, db: AsyncSession = Depends(get_db_session)) -> None:
+        """
+        Callable dependency to validate database connectivity for FastAPI routes.
+
+        Args:
+            db (AsyncSession): The database session dependency.
+        """
         self.logger.info("Database connectivity validated.")
         await self._validate(db)

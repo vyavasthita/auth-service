@@ -6,7 +6,7 @@ async def test_login_user(base_url, async_client):
     register_url = f"{base_url}/register"
     login_url = f"{base_url}/login"
 
-    shared_email = "smoke-user@example.com"
+    shared_email = "smoke-user@gmail.com"
     password = "secret"
 
     register_payload = {

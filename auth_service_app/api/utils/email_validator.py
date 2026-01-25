@@ -7,6 +7,10 @@ from api.exceptions import EmailFormatException
 def email_format_validator(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
+        """
+        Wrapper function that validates the email argument and normalizes it.
+        Raises EmailFormatException if the email is invalid.
+        """
         sig = inspect.signature(func)
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()

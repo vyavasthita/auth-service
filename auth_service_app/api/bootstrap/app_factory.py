@@ -6,6 +6,12 @@ from api.repositories.db import BaseDB
 class AppFactory:
     @staticmethod
     def create_app() -> FastAPI:
+        """
+        Create and configure the FastAPI application instance.
+
+        Returns:
+            FastAPI: The configured FastAPI application.
+        """
         app = FastAPI(
             title="Auth Service",
             summary="Authentication and Authorisation service",

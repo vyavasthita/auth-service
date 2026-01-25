@@ -1,12 +1,11 @@
-import secrets
-from functools import wraps
 from uuid import uuid4
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.utils import Security, JWTUtils
-from api.utils.email_validator import email_format_validator, EmailFormatException
+from api.utils.email_validator import email_format_validator
 from api.exceptions import (
     InvalidCredentialsException,
+    UserNotFoundException,
 )
 from api.models import User
 from api.repositories import AuthRepository, AuthRepositoryImpl
@@ -14,11 +13,17 @@ from .auth_service import AuthService
 
 
 class AuthServiceImpl(AuthService):
+    """
+    Implementation of the AuthService for user registration and login.
+    """
 
     def __init__(
         self,
         auth_repository: AuthRepository = Depends(AuthRepositoryImpl),
     ):
+        """
+        Initialize the AuthServiceImpl with an AuthRepository dependency.
+        """
         super().__init__(auth_repository)
     
     @email_format_validator
@@ -26,29 +31,37 @@ class AuthServiceImpl(AuthService):
     async def register(
         self,
         db_session: AsyncSession,
-        name: str,
         email: str,
+        name: str,
         password: str,
         phone_number: str,
     ) -> User:
+        """
+        Register a new user in the system.
+        Checks for existing user before creating.
+        """
         user = User()
         user.id = uuid4().bytes
         user.name = name
         user.email = email
         user.password = Security.hash_password(password)
         user.phone_number = phone_number
-        
         return await self.auth_repository.save(db_session, user)
 
     @email_format_validator
-    @AuthService.is_valid_user
     async def login(
         self,
-        db_session: AsyncSession,  # Automatically passed to the is_valid_user decorator
-        email: str,  # Automatically passed to the is_valid_user decorator
+        db_session: AsyncSession,
+        email: str,
         password: str,
-        user: User,  # Filled by the is_valid_user decorator
     ) -> str:
+        """
+        Authenticate a user and return a JWT token.
+        Checks for user existence and password validity.
+        """
+        user: User = await self._check_user(db_session, email)
+        if not user:
+            raise UserNotFoundException(email=email)
         if not Security.verify_password(password, user.password):
             raise InvalidCredentialsException()
         return JWTUtils.generate_auth_token({"sub": user.email})

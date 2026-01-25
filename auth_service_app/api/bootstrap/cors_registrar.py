@@ -7,6 +7,13 @@ from api.constants import constants
 class CORSRegistrar:
     @staticmethod
     def register(app: FastAPI):
+        """
+        Registers CORS settings to the FastAPI application.
+
+        This method adds the CORSMiddleware to the application with the
+        specified settings for allowed origins, methods, headers, and
+        credentials.
+        """
         app.add_middleware(
             CORSMiddleware,
             allow_origins=Config().ALLOW_ORIGINS,

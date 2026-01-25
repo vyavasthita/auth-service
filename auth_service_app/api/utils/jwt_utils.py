@@ -13,6 +13,16 @@ class JWTUtils:
     def generate_auth_token(data: Dict[str, Any], expires_delta: timedelta = None) -> str:
         """
         Generate a JWT token with the given payload and expiration.
+
+        Args:
+            data (Dict[str, Any]): The payload to encode in the JWT (e.g., {"sub": user_id})
+            expires_delta (timedelta, optional): Optional timedelta for token expiration.
+
+        Returns:
+            str: JWT token as a string.
+        """
+        """
+        Generate a JWT token with the given payload and expiration.
         Args:
             data: The payload to encode in the JWT (e.g., {"sub": user_id})
             expires_delta: Optional timedelta for token expiration

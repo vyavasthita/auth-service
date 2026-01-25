@@ -10,6 +10,12 @@ class BaseDB:
     _engine_instance: AsyncEngine | None = None
 
     def _build_connect_args(self):
+        """
+        Build connection arguments for the async MySQL engine, including SSL if configured.
+
+        Returns:
+            dict: Connection arguments for SQLAlchemy engine.
+        """
         args = {"connect_timeout": Config().CONNECT_TIMEOUT}
 
         # aiomysql expects an ssl.SSLContext, not a plain dict
@@ -24,6 +30,12 @@ class BaseDB:
         return args
 
     def _create_engine(self) -> AsyncEngine:
+        """
+        Create a new SQLAlchemy AsyncEngine instance with the configured settings.
+
+        Returns:
+            AsyncEngine: The created async engine.
+        """
         return create_async_engine(
             (
                 f"mysql+aiomysql://{Config().MYSQL_USER}:{Config().MYSQL_PASSWORD}"
@@ -41,6 +53,12 @@ class BaseDB:
         )
 
     def get_engine(self) -> AsyncEngine:
+        """
+        Return the singleton SQLAlchemy Engine instance.
+
+        Returns:
+            AsyncEngine: The singleton async engine instance.
+        """
         """
         Return the singleton SQLAlchemy Engine instance.
 
@@ -81,6 +99,9 @@ class BaseDB:
         return BaseDB._engine_instance
 
     async def dispose_engine(self) -> None:
+        """
+        Dispose the async engine (e.g., on application shutdown) to close all pooled connections.
+        """
         """
         Dispose the async engine (e.g., on application shutdown) to close all pooled connections.
         """

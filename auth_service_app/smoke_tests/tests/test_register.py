@@ -7,7 +7,7 @@ async def test_register_user(base_url, async_client):
 
     payload = {
         "name": "Test User",
-        "email": "testuser@example.com",
+        "email": "testuser@gmail.com",
         "password": "secret",
         "phone_number": "9876543210"
     }
