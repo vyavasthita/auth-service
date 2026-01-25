@@ -1,19 +1,11 @@
 from typing import List, Optional, Union
-from pydantic import field_validator
+from pydantic import field_validator, BaseModel
 from pydantic_settings import BaseSettings
 from api.constants import constants
 
 
-class Settings(BaseSettings):
-    """Application settings, intentionally small to keep FastAPI bootstrap simple."""
+class MySQLSettings(BaseModel):
     CA_CERT_PATH: str = ""
-    ENABLE_SWAGGER_UI: bool | None = True
-    
-    # OpenAPI Docs
-    OPEN_API_DOCS_URL: Optional[str] | None = "/docs"
-    OPEN_API_RE_DOC_URL: Optional[str] | None = "/redoc"
-
-    # Database
     USE_SSL: str | None = ""
     MYSQL_HOST: str | None = ""
     MYSQL_DATABASE: str | None = ""
@@ -21,24 +13,21 @@ class Settings(BaseSettings):
     MYSQL_PASSWORD: str | None = ""
     CONNECT_TIMEOUT: int = 5  # Connection timeout in seconds
 
-    RATE_LIMITED_LOG_INTERVAL_SECONDS: int = 60
-    
-    # New: Per-signal backend config for OAAS routing processor
+
+class ObservabilitySettings(BaseModel):
     OTEL_SERVICE_NAME: str = "auth-service"
     LOGGING_BACKEND: str = "opensearch"
     TRACING_BACKEND: str = "tempo"
     METRICS_BACKEND: str = "prometheus"
+    RATE_LIMITED_LOG_INTERVAL_SECONDS: int = 60
 
 
+class CORSSettings(BaseModel):
     """
     The HTTP Access-Control-Allow-Origin response header indicates whether the response 
     can be shared with requesting code from the given origin.
     """
     ALLOW_ORIGINS: Optional[str] = "http://127.0.0.1:5000"
-
-    @field_validator("ALLOW_ORIGINS")
-    def assemble_cors_origins(cls, value: str) -> Union[List[str], str]:
-        return [value]
 
     """
     The HTTP Access-Control-Allow-Credentials response header tells browsers whether 
@@ -52,6 +41,16 @@ class Settings(BaseSettings):
     """
     MAX_AGE: Optional[int] | None = 60  # Seconds
 
+    @field_validator("ALLOW_ORIGINS")
+    def assemble_cors_origins(cls, value: str) -> Union[List[str], str]:
+        return [value]
+
+class OpenAPISettings(BaseModel):
+    ENABLE_SWAGGER_UI: bool | None = True
+    OPEN_API_DOCS_URL: Optional[str] | None = "/docs"
+    OPEN_API_RE_DOC_URL: Optional[str] | None = "/redoc"
+
+class OtherSettings(BaseModel):
     LOG_LEVEL: str = "INFO"
 
     @field_validator("LOG_LEVEL")
@@ -60,5 +59,8 @@ class Settings(BaseSettings):
             raise ValueError(
                 f"Invalid LOGLEVEL: {value}. Choose from {constants.VALID_LOG_LEVELS}"
             )
-
         return value
+
+class Settings(MySQLSettings, ObservabilitySettings, CORSSettings, OpenAPISettings, OtherSettings, BaseSettings):
+    """Application settings, composed from multiple config classes."""
+    pass
