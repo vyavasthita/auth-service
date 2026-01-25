@@ -61,6 +61,12 @@ class OtherSettings(BaseModel):
             )
         return value
 
-class Settings(MySQLSettings, ObservabilitySettings, CORSSettings, OpenAPISettings, OtherSettings, BaseSettings):
+class Settings(
+    MySQLSettings, 
+    ObservabilitySettings, 
+    CORSSettings, 
+    OpenAPISettings, 
+    OtherSettings, 
+    BaseSettings):
     """Application settings, composed from multiple config classes."""
     pass
