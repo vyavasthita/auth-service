@@ -4,14 +4,13 @@ from .base_exception import BaseException
 
 
 class UserNotFoundException(BaseException):
-    def __init__(self, identifier: str):
-        super().__init__(status.HTTP_404_NOT_FOUND, f"User with '{identifier}' not found.")
+    def __init__(self, email: str):
+        super().__init__(status.HTTP_404_NOT_FOUND, f"User with '{email}' not found.")
 
 
 class UserAlreadyExistsException(BaseException):
     def __init__(self, email: str):
-        self.email = email
-        super().__init__(status.HTTP_409_CONFLICT, f"User with '{self.email}' already exists.")
+        super().__init__(status.HTTP_409_CONFLICT, f"User with '{email}' already exists.")
 
 
 class InvalidCredentialsException(BaseException):
@@ -19,5 +18,5 @@ class InvalidCredentialsException(BaseException):
         super().__init__(status.HTTP_401_UNAUTHORIZED, "Invalid email or password.")
 
 class EmailFormatException(BaseException):
-    def __init__(self, email: str):
-        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Email '{email}' is invalid")
+    def __init__(self, message: str):
+        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, message)

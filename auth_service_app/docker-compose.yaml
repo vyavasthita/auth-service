@@ -31,6 +31,8 @@ services:
       test: curl --fail http://localhost:5001/app_health || exit 1
       start_period: 10s
       interval: 20s
+    volumes:
+      - ./api:/app/api
     networks:
       - auth-service-api-network
       - observability
