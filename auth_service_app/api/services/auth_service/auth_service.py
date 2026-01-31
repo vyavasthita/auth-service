@@ -1,19 +1,26 @@
 from abc import ABC, abstractmethod
 from functools import wraps
+import jwt
+import time
 from sqlalchemy.ext.asyncio import AsyncSession
-from api.utils import Security
+from api.utils import Security, JWTUtils
 from api.models import User
 from api.repositories import AuthRepository
 from api.exceptions import (
     UserAlreadyExistsException,
     UserNotFoundException,
     InvalidCredentialsException,
+    InvalidTokenException,
 )
+from api.utils import AuthServiceLogger
 
 class AuthService(ABC):
     """
     Abstract base class for authentication service.
     """
+    def __init__(self):
+        self.logger = AuthServiceLogger.get_logger()
+
     async def _check_user(self, db_session: AsyncSession, email: str) -> User | None:
         """
         Check if a user exists by email.
@@ -59,6 +66,44 @@ class AuthService(ABC):
                 raise InvalidCredentialsException()
             
             return await func(self, db_session, email, password)
+    
+    @staticmethod
+    def is_valid_token(func):
+        """
+        Decorator to ensure the token is valid
+        """
+        @wraps(func)
+        async def wrapper(self, db_session: AsyncSession, token: str, **kwargs):
+            self.logger.debug(f"Validating token.")
+            
+
+            try:
+                claims = JWTUtils.decode_auth_token(token)
+                self.logger.debug(f"validate_token claims: {claims}")
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+                self.logger.debug("Token is invalid.")
+                raise InvalidTokenException()
+
+            # Check token expiry manually if not handled by decode_auth_token
+            
+            exp = claims.get('exp')
+            
+            if exp is not None:
+                now = int(time.time())
+                if isinstance(exp, float):
+                    exp = int(exp)
+                if now > exp:
+                    self.logger.debug("Token is expired.")
+                    raise InvalidTokenException()
+
+            user = await self._check_user(db_session, claims["sub"])
+
+            if user is None:
+                raise UserNotFoundException(email=claims["sub"])
+            
+            kwargs['user'] = user
+            
+            return await func(self, db_session, token, **kwargs)
         
         return wrapper
 
@@ -114,3 +159,13 @@ class AuthService(ABC):
         Abstract method to authenticate a user and return a token.
         """
         raise NotImplementedError("Method 'login' needs implementation.")
+
+    @abstractmethod
+    async def validate_token(
+        self,
+        token: str,
+    ) -> dict:
+        """
+        Abstract method to validate a JWT token and return claims or raise exception.
+        """
+        raise NotImplementedError("Method 'validate_token' needs implementation.")

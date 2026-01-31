@@ -7,6 +7,7 @@ from api.utils import Security, JWTUtils
 from api.utils.email_validator import email_format_validator
 from api.models import User
 from api.repositories import AuthRepository, AuthRepositoryImpl
+from api.exceptions import InvalidTokenException
 from .auth_service import AuthService
 
 
@@ -64,3 +65,19 @@ class AuthServiceImpl(AuthService):
         claims = {"sub": email, "exp": expire}
 
         return JWTUtils.generate_auth_token(claims=claims)
+    
+
+    @AuthService.is_valid_token
+    async def validate_token(
+        self,
+        token: str,
+        **kwargs
+    ) -> User:
+        """
+        Validate a JWT token and return claims if valid, else raise InvalidTokenException.
+        """
+        self.logger.debug(f"validate_token called with token: {token}")
+
+        user = kwargs.get('user')
+        self.logger.debug(f"validate_token got user: {user}")
+        return user

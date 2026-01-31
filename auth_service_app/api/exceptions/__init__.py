@@ -6,4 +6,6 @@ from .user_exception import (
 	UserNotFoundException,
     EmailFormatException,
 )
+
+from .token_exception import InvalidTokenException
 from ..exceptions.exception_handlers import register_exception_handlers

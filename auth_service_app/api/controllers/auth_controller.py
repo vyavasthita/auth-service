@@ -7,6 +7,8 @@ from api.dtos import (
     RegisterUserResponseDTO,
     LoginUserRequestDTO,
     LoginUserResponseDTO,
+    ValidateTokenRequestDTO,
+    ValidateTokenResponseDTO,
 )
 from api.models import User
 from api.dependencies import get_db_session
@@ -29,6 +31,12 @@ class AuthController:
         self.router.add_api_route(
             "/login",
             self.login,
+            methods=["POST"],
+        )
+
+        self.router.add_api_route(
+            "/validate-token",
+            self.validate_token,
             methods=["POST"],
         )
 
@@ -73,3 +81,14 @@ class AuthController:
         )
         self.logger.info(f"User logged in: {request.email}")
         return LoginUserResponseDTO(access_token=token)
+
+    async def validate_token(
+        self,
+        request: ValidateTokenRequestDTO,
+        auth_service: AuthService = Depends(AuthServiceImpl),
+    ) -> ValidateTokenResponseDTO:
+        """
+        Validate a JWT token and return claims if valid.
+        """
+        user: User = await auth_service.validate_token(request.token)
+        return ValidateTokenResponseDTO(email=user.email, message="Token is valid.")

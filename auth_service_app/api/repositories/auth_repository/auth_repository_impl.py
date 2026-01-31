@@ -9,6 +9,7 @@ from api.models import User
 from .auth_repository import AuthRepository
 from api.exceptions import DBConnectionException
 
+
 class AuthRepositoryImpl(AuthRepository):
     """
     For all CRUD operations in DB for User object.
@@ -67,3 +68,6 @@ class AuthRepositoryImpl(AuthRepository):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 message="Database error while processing your request.",
             )
+    async def validate_token(self, token: str) -> bool:
+        # Stub for extensibility (e.g., token blacklist, DB check)
+        return True

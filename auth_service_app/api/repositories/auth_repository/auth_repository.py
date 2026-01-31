@@ -19,3 +19,7 @@ class AuthRepository(ABC):
     @abstractmethod
     async def find_by_email(self, db_session: AsyncSession, email: str) -> Optional[User]:
         raise NotImplementedError("Method 'find_by_email' needs implementation.")
+
+    # Optional: For extensibility, e.g., token blacklist or DB-backed validation
+    async def validate_token(self, token: str) -> bool:
+        raise NotImplementedError("Method 'validate_token' needs implementation.")
