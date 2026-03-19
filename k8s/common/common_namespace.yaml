@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tic-tac-toe
+  labels:
+    app.kubernetes.io/name: tic-tac-toe
+    app.kubernetes.io/part-of: tic-tac-toe
