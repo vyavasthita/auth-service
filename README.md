@@ -1,244 +1,139 @@
 README: |
   # Auth Service
 
-  Production-ready authentication and authorization service for modern backend systems.
-
-  This service provides OAuth2-compliant authentication, JWT-based authorization, role-based access control (RBAC), and secure service-to-service authentication. It is designed to be stateless, scalable, observable, and cloud-native.
+  ## About
+ Authentication and authorization service for modern microservices.
 
   ---
 
   ## Key Features
 
-  - OAuth2 authentication flows
-  - JWT access and refresh tokens
-  - Token rotation and expiration
+  - JWT access
+  - Token expiration
   - Role-Based Access Control (RBAC)
   - Service-to-service authentication
-  - API key support
   - OpenTelemetry-based observability
-  - Prometheus metrics and structured logging
-  - Horizontal scalability
-  - Docker and Kubernetes ready
 
   ---
 
   ## Tech Stack
 
   - **Backend Framework:** FastAPI (Python)
-  - **Authentication:** OAuth2, JWT (access and refresh tokens)
+  - **Authentication:** JWT (access and refresh tokens)
   - **Authorization:** Role-Based Access Control (RBAC)
-  - **Database:** PostgreSQL (system of record)
-  - **Cache / Ephemeral Storage:** Redis
+  - **Database:** MySql
   - **Observability:** OpenTelemetry
-  - **Metrics:** Prometheus
-  - **Tracing:** Tempo or Jaeger
-  - **Logging:** Loki
   - **Containerization:** Docker
-  - **Orchestration:** Docker Compose, Kubernetes
-  - **Deployment:** Helm charts
+  - **Orchestration:** Docker Compose
 
-  ---
-
-  ## Architecture Overview
-
-    ```mermaid
-    flowchart TD
-        Client[Client]
-        Backend[Backend Services]
-        Auth[Auth Service]
-        DB[(PostgreSQL)]
-        Cache[(Redis)]
-        Prom[Prometheus]
-        Graf[Grafana]
-        Loki[Loki]
-        Trace[Tempo / Jaeger]
-
-        Client -->|Login / Refresh| Auth
-        Backend -->|JWT / API Key| Auth
-        Auth -->|Users, Roles| DB
-        Auth -->|Tokens, Rate Limits| Cache
-        Auth -->|Metrics| Prom
-        Auth -->|Logs| Loki
-        Auth -->|Traces| Trace
-        Prom --> Graf
-    ```
-
-  ---
-
-  ## Redis Usage
-
-  Redis is used for short-lived and security-sensitive data that requires fast access and automatic expiration (TTL).
-
-  Primary use cases:
-
-  - Refresh token storage and rotation
-  - Token revocation and blacklisting
-  - Rate limiting for authentication endpoints
-  - Temporary OAuth2 authorization state
-  - Password reset and email verification tokens
-
-  Redis is **not** used as a system of record. PostgreSQL remains the authoritative datastore.
-
-  ---
-
-  ## Authentication Flow – Login
-
-    ```mermaid
-    sequenceDiagram
-        participant Client
-        participant Auth
-        participant DB
-        participant Redis
-
-        Client->>Auth: POST /login (credentials)
-        Auth->>DB: Validate user credentials
-        DB-->>Auth: User record
-        Auth->>Redis: Store refresh token (TTL)
-        Auth-->>Client: Access token + Refresh token
-    ```
-
-  ---
-
-  ## Authentication Flow – Token Refresh
-
-    ```mermaid
-    sequenceDiagram
-        participant Client
-        participant Auth
-        participant Redis
-
-        Client->>Auth: POST /token/refresh
-        Auth->>Redis: Validate refresh token
-        Redis-->>Auth: Token valid
-        Auth->>Redis: Rotate refresh token
-        Auth-->>Client: New access token + New refresh token
-    ```
-
-  ---
-
-  ## Authentication and Authorization
-
-  Authentication supports OAuth2 flows including username/password and client credentials.
-
-  Authorization is implemented using JWTs with embedded claims and role-based access control.
-
-  Access tokens are short-lived. Refresh tokens are rotated on every use to reduce replay risk.
-
-  Service-to-service authentication is supported using API keys or OAuth2 client credentials.
-
-  ---
-
-  ## Observability
-
-  The service is instrumented using OpenTelemetry from the ground up.
-
-  It exposes:
-
-  - Distributed traces for request flows
-  - Metrics such as request latency, error rates, and authentication failures
-  - Structured logs correlated with traces
-
-  The service integrates with Prometheus, Grafana, Loki, Tempo, and Jaeger.
-
-  ---
-
-  ## Threat Model and Security Considerations
-
-  ### Threats Addressed
-
-  - **Brute force login attacks** – mitigated using Redis-backed rate limiting
-  - **Token replay attacks** – mitigated using short-lived access tokens and refresh token rotation
-  - **Token theft** – mitigated using HTTPS, short token lifetimes, and revocation support
-  - **Privilege escalation** – mitigated using RBAC and strict claim validation
-  - **Stolen refresh tokens** – mitigated using one-time-use refresh tokens and rotation
-  - **Unauthorized service access** – mitigated using service-to-service authentication and API keys
-
-  ### Security Best Practices
-
-  - Passwords are stored as salted hashes
-  - Secrets are injected via environment variables
-  - Tokens include issuer, audience, and expiration claims
-  - No sensitive data is logged
-  - Authentication endpoints are rate limited
-
-  ---
-
-  ## Getting Started
-
-  ### Prerequisites
-
-  - Docker
-  - Docker Compose
-
-  ### Running Locally
-
-    Before running the service, export the MySQL root password environment variable:
-
-    ```bash
-    export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
-    docker-compose up --build
-    ```
-
-
-  Service will be available at:
-
-  - http://localhost:5001/auth-service
-
-
----
-
-## API Endpoints
-
-- `POST /auth-service/login`
-- `POST /auth-service/register`
-- `GET /auth-service/app_health`
-- `GET /auth-service/db_health`
-
----
-
-## Testing
-
-The project includes unit and integration tests.
+  ## Quick Start
 
   ```bash
-  make test
+  cd components
+  export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
+  make up
   ```
 
----
+  Service available at: **http://localhost:5001/auth-service/docs**
 
-## Deployment
+  ---
 
-- Production-ready Docker image
-- Configuration via environment variables
-- Designed for horizontal scaling and zero-downtime deployments
+  ## Run Tests
 
----
+  ```bash
+  cd components
+  make app-test
+  ```
 
-## Use Cases
+  ---
 
-- SaaS platforms
-- Microservice architectures
-- Internal developer platforms
-- API-first products
-- AI and data platforms
+  ## Architecture
 
----
+  ```mermaid
+  flowchart LR
+      Client --> AuthController
+      AuthController --> AuthService
+      AuthService --> AuthRepository
+      AuthRepository --> MySQL[(MySQL)]
+  ```
 
-## Why This Project
+  ### Request Lifecycle
 
-This project demonstrates real-world backend engineering practices including secure authentication, scalable architecture, observability-first design, and clean code organization.
+  ```mermaid
+  sequenceDiagram
+      participant C as Client
+      participant Ctrl as AuthController
+      participant Svc as AuthServiceImpl
+      participant Repo as AuthRepository
+      participant DB as MySQL
 
-It is intended as a reference implementation of a production-grade authentication service.
+      C->>Ctrl: POST /register
+      Ctrl->>Svc: register(db_session, ...)
+      Svc->>Repo: save(session, user)
+      Repo->>DB: INSERT INTO users
+      DB-->>Repo: user row
+      Repo-->>Svc: User
+      Svc-->>Ctrl: User
+      Ctrl-->>C: 201 RegisterUserResponseDTO
+  ```
 
----
+  ---
 
-## Author
+  ## Core Roles
 
-Dilip Kumar Sharma 
-Backend Engineer | Distributed Systems | Observability | Security
+  | Layer | Class | Responsibility |
+  |-------|-------|----------------|
+  | Controller | `AuthController` | HTTP routing, request/response DTOs |
+  | Service | `AuthServiceImpl` | Business logic, decorators (`is_new_user`, `is_valid_user`, `is_valid_token`) |
+  | Repository | `AuthRepository` → `BaseRepository` | Async CRUD via `session.add` / `flush` |
+  | Model | `User` | SQLAlchemy 2.0 `DeclarativeBase` + `Mapped` + `mapped_column()` |
+  | Config | `Settings` | Composite pydantic-settings (MySQL, JWT, CORS, DB pool, observability) |
 
----
+  ---
 
+  ## Project Layout
+
+  ```
+  auth-service/
+  ├── components/
+  │   ├── Makefile                    # Aggregate make targets
+  │   ├── docker-compose.yaml         # Root compose (includes app + db)
+  │   ├── auth_service_app/
+  │   │   ├── Dockerfile
+  │   │   ├── Makefile
+  │   │   ├── pyproject.toml
+  │   │   ├── src/
+  │   │   │   ├── api/
+  │   │   │   │   ├── bootstrap/      # AppFactory, Initializer, CORS, Instrumentation
+  │   │   │   │   ├── config/         # Split pydantic-settings (app, mysql, jwt, cors, ...)
+  │   │   │   │   ├── constants/      # Frozen dataclass constants
+  │   │   │   │   ├── controllers/    # AuthController, HealthController
+  │   │   │   │   ├── dependencies/   # Config, DatabaseDependency
+  │   │   │   │   ├── dtos/           # Request/Response DTOs
+  │   │   │   │   ├── exceptions/     # Typed exceptions + handlers
+  │   │   │   │   ├── models/         # SQLAlchemy 2.0 DeclarativeBase models
+  │   │   │   │   ├── repos/          # Generic base repo + AuthRepository
+  │   │   │   │   └── services/       # AuthService (abstract + impl)
+  │   │   │   └── utils/              # Logger, Security, JWTUtils, email validator
+  │   │   └── tests/
+  │   └── auth_service_db/
+  │       └── migrations/             # Liquibase changelogs
+  └── README.md
+  ```
+
+  ---
+
+  ## API Endpoints
+
+  | Method | Path | Description |
+  |--------|------|-------------|
+  | `POST` | `/register` | Register a new user |
+  | `POST` | `/login` | Authenticate and get JWT |
+  | `POST` | `/validate-token` | Validate JWT and get user claims |
+  | `GET` | `/app_health` | Application health check |
+  | `GET` | `/db_health` | Database connectivity check |
+
+  ---
 ## License
 
 Copyright © 2026 Dilip Kumar Sharma
