@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0001-user"
+      author: dilipsharma
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  autoIncrement: false
+                  remarks: The primary_key of the table
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  remarks: Name of user
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  remarks: Email of user
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(255)
+                  remarks: Password of user
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(255)
+                  remarks: Phone number of user
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  remarks: Timestamp when the user was created
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified_at
+                  type: datetime
+                  remarks: Timestamp when the user was last modified
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+          remarks: User table
+          ifNotExists: true

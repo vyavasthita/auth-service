@@ -1,0 +1,12 @@
+include:
+  - path:
+      - ./auth_service_db/docker-compose.yaml
+  - path:
+      - ./auth_service_app/docker-compose.yaml
+
+networks:
+    auth-service-api-network:
+        name: auth-service-api-network
+    observability:
+        external: true
+        name: ${OBSERVABILITY_NETWORK_NAME:-oaas-observability-net}

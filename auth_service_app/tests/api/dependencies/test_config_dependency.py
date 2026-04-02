@@ -1,7 +1,0 @@
-import pytest
-from auth_service_app.api.dependencies import Config
-
-
-@pytest.mark.asyncio
-async def test_get_config_import():
-    assert Config() is not None
