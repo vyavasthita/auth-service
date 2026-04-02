@@ -1,2 +1,0 @@
-from .validate_token_request_dto import ValidateTokenRequestDTO
-from .validate_token_response_dto import ValidateTokenResponseDTO
