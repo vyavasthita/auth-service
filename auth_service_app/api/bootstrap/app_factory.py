@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from api.dependencies import Config
 from api.repositories.db import BaseDB
 
@@ -12,8 +12,6 @@ class AppFactory:
         Returns:
             FastAPI: The configured FastAPI application.
         """
-        from contextlib import asynccontextmanager
-
         @asynccontextmanager
         async def lifespan(app: FastAPI):
             yield
