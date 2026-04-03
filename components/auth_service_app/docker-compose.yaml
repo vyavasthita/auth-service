@@ -49,8 +49,6 @@ services:
     depends_on:
       auth-service:
         condition: service_healthy
-      auth-service-liquibase:
-        condition: service_completed_successfully
     environment:
       BASE_URL: http://auth-service:${API_PORT}/${SERVICE_NAME}
     networks:
