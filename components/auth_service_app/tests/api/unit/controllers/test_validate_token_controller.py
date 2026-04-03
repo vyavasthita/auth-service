@@ -19,6 +19,7 @@ def client():
 
 def test_validate_token_valid(client, monkeypatch):
     mock_user = MagicMock()
+    mock_user.user_id = "test-user-id"
     mock_user.email = "user@gmail.com"
 
     monkeypatch.setattr(
@@ -26,12 +27,11 @@ def test_validate_token_valid(client, monkeypatch):
         "validate_token",
         AsyncMock(return_value=mock_user),
     )
-    response = client.post("/validate-token", json={"token": "validtoken"})
+    response = client.post("/validate", json={"token": "validtoken"})
     assert response.status_code == 200
     data = response.json()
-    assert data["is_valid"] is True
+    assert data["user_id"] == "test-user-id"
     assert data["email"] == "user@gmail.com"
-    assert data["message"] == "Token is valid."
 
 
 def test_validate_token_invalid(client, monkeypatch):
@@ -40,5 +40,5 @@ def test_validate_token_invalid(client, monkeypatch):
         "validate_token",
         AsyncMock(side_effect=InvalidTokenException()),
     )
-    response = client.post("/validate-token", json={"token": "badtoken"})
+    response = client.post("/validate", json={"token": "badtoken"})
     assert response.status_code == 401

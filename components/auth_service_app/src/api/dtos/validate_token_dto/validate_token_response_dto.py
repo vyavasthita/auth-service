@@ -2,6 +2,6 @@ from pydantic import BaseModel
 
 
 class ValidateTokenResponseDTO(BaseModel):
-    is_valid: bool = True
+    user_id: str | None = None
     email: str | None = None
     message: str | None = None

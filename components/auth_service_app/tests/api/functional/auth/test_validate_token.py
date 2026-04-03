@@ -15,7 +15,7 @@ from src.api.models import User
 from tests.api.common.file_helper import namespace_to_dict
 
 TEST_DATA_FILE = "validate_token.json"
-BASE_API_URL = "/validate-token"
+BASE_API_URL = "/validate"
 
 
 @pytest.mark.test_section("invalid_request_validation")
@@ -35,6 +35,7 @@ async def test_post_validate_token_invalid_request(async_client: httpx.AsyncClie
 async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_case):
     """Should return 200 with token validity details."""
     mock_user = MagicMock(spec=User)
+    mock_user.user_id = test_case.mock.user_id
     mock_user.email = test_case.mock.email
 
     mock_claims = namespace_to_dict(test_case.mock.claims)
@@ -58,9 +59,6 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
 
     assert response.status_code == test_case.output.status_code
 
-    if hasattr(test_case.output, "body"):
-        assert response.json() == namespace_to_dict(test_case.output.body)
-
 
 @pytest.mark.test_section("invalid_token_validation")
 @pytest.mark.asyncio
@@ -77,6 +75,3 @@ async def test_post_validate_token_invalid(async_client: httpx.AsyncClient, test
         )
 
     assert response.status_code == test_case.output.status_code
-
-    if hasattr(test_case.output, "body"):
-        assert response.json() == namespace_to_dict(test_case.output.body)

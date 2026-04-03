@@ -73,7 +73,7 @@ async def login(
 
 
 @auth_router.post(
-    "/validate-token",
+    "/validate",
     response_model=ValidateTokenResponseDTO,
 )
 async def validate_token(
@@ -83,4 +83,4 @@ async def validate_token(
 ) -> ValidateTokenResponseDTO:
     """Validate a JWT token and return claims if valid."""
     user: User = await auth_service.validate_token(db_session=db_session, token=request.token)
-    return ValidateTokenResponseDTO(email=user.email, message="Token is valid.")
+    return ValidateTokenResponseDTO(user_id=user.user_id, email=user.email, message="Token is valid.")

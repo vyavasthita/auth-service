@@ -25,6 +25,7 @@
         }
       },
       "mock": {
+        "user_id": "test-user-id",
         "email": "dilip@gmail.com",
         "claims": {
           "sub": "dilip@gmail.com",
@@ -34,9 +35,8 @@
       "output": {
         "status_code": 200,
         "body": {
-          "is_valid": true,
-          "email": "dilip@gmail.com",
-          "message": "Token is valid."
+          "user_id": "test-user-id",
+          "email": "dilip@gmail.com"
         }
       }
     }

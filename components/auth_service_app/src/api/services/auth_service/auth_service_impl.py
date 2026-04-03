@@ -40,7 +40,7 @@ class AuthServiceImpl(AuthService):
         user_id = uuid4().bytes
 
         user = User(
-            id=user_id,
+            user_id=user_id,
             email=email,
             password=Security.hash_password(password),
         )
