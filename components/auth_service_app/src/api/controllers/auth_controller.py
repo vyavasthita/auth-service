@@ -38,18 +38,20 @@ async def register(
     auth_service: AuthService = Depends(AuthServiceImpl),
 ) -> RegisterUserResponseDTO:
     """Register a new user."""
-    logger.info(f"Register endpoint called for email: {request.email}")
+    logger.info(f"Register endpoint called for username: {request.username}")
     user: User = await auth_service.register(
         db_session=db_session,
+        username=request.username,
         email=request.email,
         first_name=request.first_name,
         last_name=request.last_name,
         password=request.password,
         phone_number=request.phone_number,
     )
-    logger.info(f"User registered: {user.email}")
+    logger.info(f"User registered: {user.username}")
     return RegisterUserResponseDTO(
-        email=user.email,
+        username=user.username,
+        email=user.profile.email,
         first_name=user.profile.first_name,
         last_name=user.profile.last_name,
         phone_number=user.profile.phone_number,
@@ -67,14 +69,14 @@ async def login(
     auth_service: AuthService = Depends(AuthServiceImpl),
 ) -> LoginUserResponseDTO:
     """Authenticate a user and set an access token cookie."""
-    logger.info(f"Login endpoint called for email: {request.email}")
+    logger.info(f"Login endpoint called for username: {request.username}")
 
     token: str = await auth_service.login(
         db_session=db_session,
-        email=request.email,
+        username=request.username,
         password=request.password,
     )
-    
+
     response.set_cookie(
         key=config.COOKIE_NAME,
         value=token,
@@ -84,7 +86,7 @@ async def login(
         path=config.COOKIE_PATH,
         max_age=config.TOKEN_EXPIRE_MINUTES * 60,
     )
-    logger.info(f"User logged in: {request.email}")
+    logger.info(f"User logged in: {request.username}")
     return LoginUserResponseDTO()
 
 
@@ -103,7 +105,7 @@ async def validate_token(
     user: User = await auth_service.validate_token(db_session=db_session, token=access_token)
     return ValidateTokenResponseDTO(
         user_id=str(UUID(bytes=user.user_id)),
-        email=user.email,
+        username=user.username,
         message="Token is valid.",
     )
 

@@ -17,13 +17,13 @@ def is_new_user(func):
     """Decorator to ensure the user does not already exist before registration."""
 
     @wraps(func)
-    async def wrapper(self, db_session: AsyncSession, email: str, *args, **kwargs):
-        user = await self._check_user(db_session, email)
+    async def wrapper(self, db_session: AsyncSession, username: str, *args, **kwargs):
+        user = await self._check_user(db_session, username)
 
         if user is not None:
-            raise UserAlreadyExistsException(email=email)
+            raise UserAlreadyExistsException(username=username)
 
-        return await func(self, db_session, email, *args, **kwargs)
+        return await func(self, db_session, username, *args, **kwargs)
 
     return wrapper
 
@@ -32,18 +32,18 @@ def is_valid_user(func):
     """Decorator to ensure the user exists and password is valid before login."""
 
     @wraps(func)
-    async def wrapper(self, db_session: AsyncSession, email: str, password: str, **kwargs):
-        user = await self._check_user(db_session, email)
+    async def wrapper(self, db_session: AsyncSession, username: str, password: str, **kwargs):
+        user = await self._check_user(db_session, username)
 
         if user is None:
-            raise UserNotFoundException(email=email)
+            raise UserNotFoundException(username=username)
 
         if not Security.verify_password(password, user.password):
             raise InvalidCredentialsException()
 
         kwargs["user"] = user
 
-        return await func(self, db_session, email, password, **kwargs)
+        return await func(self, db_session, username, password, **kwargs)
 
     return wrapper
 
@@ -75,7 +75,7 @@ def is_valid_token(func):
         user = await self._check_user(db_session, claims["sub"])
 
         if user is None:
-            raise UserNotFoundException(email=claims["sub"])
+            raise UserNotFoundException(username=claims["sub"])
 
         kwargs["user"] = user
 

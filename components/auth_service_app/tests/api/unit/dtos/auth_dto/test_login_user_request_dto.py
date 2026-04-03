@@ -5,6 +5,6 @@ from src.api.dtos import LoginUserRequestDTO
 
 @pytest.mark.asyncio
 async def test_login_user_request_dto_fields():
-    dto = LoginUserRequestDTO(email="test@example.com", password="password123")
-    assert dto.email == "test@example.com"
+    dto = LoginUserRequestDTO(username="dilip_sharma", password="password123")
+    assert dto.username == "dilip_sharma"
     assert dto.password == "password123"

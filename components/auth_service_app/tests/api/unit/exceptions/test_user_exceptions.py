@@ -4,9 +4,9 @@ from src.api.exceptions import UserAlreadyExistsException, UserNotFoundException
 
 
 def test_user_already_exists_exception():
-    email = "test@example.com"
-    exc = UserAlreadyExistsException(email)
-    assert exc.email == email
+    username = "test_user"
+    exc = UserAlreadyExistsException(username)
+    assert exc.username == username
     assert exc.status_code == status.HTTP_409_CONFLICT
 
 

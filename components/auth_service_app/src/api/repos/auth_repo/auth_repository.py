@@ -15,10 +15,10 @@ class AuthRepository(BaseRepository[User, bytes], IAuthRepository):
     async def save(self, session: AsyncSession, user: User) -> User:
         return await self.create(session, user)
 
-    async def find_by_email(self, session: AsyncSession, email: str) -> User | None:
+    async def find_by_username(self, session: AsyncSession, username: str) -> User | None:
         try:
-            statement = select(User).where(User.email == email).limit(1)
+            statement = select(User).where(User.username == username).limit(1)
             result = await session.execute(statement)
             return result.scalar_one_or_none()
         except Exception as error:
-            self._handle_db_error("find_by_email", error)
+            self._handle_db_error("find_by_username", error)

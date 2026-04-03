@@ -25,7 +25,7 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
     """Should return 200 with token validity details."""
     mock_user = MagicMock(spec=User)
     mock_user.user_id = UUID(test_case.mock.user_id).bytes
-    mock_user.email = test_case.mock.email
+    mock_user.username = test_case.mock.username
 
     mock_claims = namespace_to_dict(test_case.mock.claims)
     cookies = namespace_to_dict(test_case.input.cookie)
@@ -36,7 +36,7 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
             return_value=mock_claims,
         ),
         patch(
-            "src.api.repos.auth_repo.auth_repository.AuthRepository.find_by_email",
+            "src.api.repos.auth_repo.auth_repository.AuthRepository.find_by_username",
             new_callable=AsyncMock,
             return_value=mock_user,
         ),

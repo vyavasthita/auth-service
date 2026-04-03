@@ -7,9 +7,11 @@ async def test_login_user(base_url, async_client):
     login_url = f"{base_url}/login"
 
     shared_email = "smoke-user@gmail.com"
+    shared_username = "smoke_user"
     password = "secret"
 
     register_payload = {
+        "username": shared_username,
         "first_name": "Smoke",
         "last_name": "Test User",
         "email": shared_email,
@@ -23,7 +25,7 @@ async def test_login_user(base_url, async_client):
     )
 
     login_payload = {
-        "email": shared_email,
+        "username": shared_username,
         "password": password,
     }
 

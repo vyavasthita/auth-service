@@ -34,6 +34,13 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: email
+                  type: varchar(255)
+                  remarks: Email of the user
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: user_id
                   type: BINARY(16)
                   remarks: Foreign key to users table

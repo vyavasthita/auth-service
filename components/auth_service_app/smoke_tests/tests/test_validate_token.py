@@ -8,9 +8,11 @@ async def test_validate_token_smoke(base_url, async_client):
     validate_url = f"{base_url}/validate"
 
     shared_email = "smoke-validate-user@gmail.com"
+    shared_username = "smoke_validate_user"
     password = "smokepass123"
 
     register_payload = {
+        "username": shared_username,
         "first_name": "Smoke",
         "last_name": "Validate User",
         "email": shared_email,
@@ -24,7 +26,7 @@ async def test_validate_token_smoke(base_url, async_client):
     )
 
     login_response = await async_client.post(login_url, json={
-        "email": shared_email,
+        "username": shared_username,
         "password": password,
     })
     assert login_response.status_code == 200, (
@@ -42,4 +44,4 @@ async def test_validate_token_smoke(base_url, async_client):
     )
 
     data = validate_response.json()
-    assert data["email"] == shared_email
+    assert data["username"] == shared_username

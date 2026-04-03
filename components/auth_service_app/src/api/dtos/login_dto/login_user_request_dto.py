@@ -1,11 +1,11 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
 class LoginUserRequestDTO(BaseModel):
     # DTO for user login request payload.
-    email: EmailStr = Field(
-        description="Email ID of the user.",
-        json_schema_extra={"example": "dilip@gmail.com"},
+    username: str = Field(
+        description="Username of the user.",
+        json_schema_extra={"example": "dilip_sharma"},
     )
 
     password: str = Field(

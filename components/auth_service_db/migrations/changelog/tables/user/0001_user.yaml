@@ -15,9 +15,9 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: email
+                  name: username
                   type: varchar(255)
-                  remarks: Email of user
+                  remarks: Username of user
                   constraints:
                     nullable: false
                     unique: true

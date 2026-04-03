@@ -22,13 +22,14 @@ class AuthService(ABC):
     def auth_repository(self, auth_repository: IAuthRepository) -> None:
         self._auth_repository = auth_repository
 
-    async def _check_user(self, db_session: AsyncSession, email: str) -> User | None:
-        return await self.auth_repository.find_by_email(db_session, email=email)
+    async def _check_user(self, db_session: AsyncSession, username: str) -> User | None:
+        return await self.auth_repository.find_by_username(db_session, username=username)
 
     @abstractmethod
     async def register(
         self,
         db_session: AsyncSession,
+        username: str,
         email: str,
         first_name: str,
         last_name: str,
@@ -41,7 +42,7 @@ class AuthService(ABC):
     async def login(
         self,
         db_session: AsyncSession,
-        email: str,
+        username: str,
         password: str,
     ) -> str:
         raise NotImplementedError("Method 'login' needs implementation.")

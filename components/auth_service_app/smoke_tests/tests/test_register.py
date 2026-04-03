@@ -6,6 +6,7 @@ async def test_register_user(base_url, async_client):
     url = f"{base_url}/register"
 
     payload = {
+        "username": "testuser",
         "first_name": "Test",
         "last_name": "User",
         "email": "testuser@gmail.com",

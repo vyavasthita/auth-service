@@ -22,7 +22,7 @@ def test_validate_token_valid(client, monkeypatch):
     test_uuid = UUID("12345678-1234-5678-1234-567812345678")
     mock_user = MagicMock()
     mock_user.user_id = test_uuid.bytes
-    mock_user.email = "user@gmail.com"
+    mock_user.username = "dilip_sharma"
 
     monkeypatch.setattr(
         AuthServiceImpl,
@@ -33,7 +33,7 @@ def test_validate_token_valid(client, monkeypatch):
     assert response.status_code == 200
     data = response.json()
     assert data["user_id"] == str(test_uuid)
-    assert data["email"] == "user@gmail.com"
+    assert data["username"] == "dilip_sharma"
 
 
 def test_validate_token_missing_cookie(client):

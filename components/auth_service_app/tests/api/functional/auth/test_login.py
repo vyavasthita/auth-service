@@ -34,12 +34,12 @@ async def test_post_login_invalid_request(async_client: httpx.AsyncClient, test_
 async def test_post_login_valid_request(async_client: httpx.AsyncClient, test_case):
     """Should return 200 with access token on valid credentials."""
     mock_user = MagicMock(spec=User)
-    mock_user.email = test_case.mock.user_email
+    mock_user.username = test_case.mock.user_username
     mock_user.password = test_case.mock.user_password_hash
 
     with (
         patch(
-            "src.api.repos.auth_repo.auth_repository.AuthRepository.find_by_email",
+            "src.api.repos.auth_repo.auth_repository.AuthRepository.find_by_username",
             new_callable=AsyncMock,
             return_value=mock_user,
         ),

@@ -10,7 +10,7 @@ class User(Base):
     __tablename__ = "users"
 
     user_id: Mapped[bytes] = mapped_column(LargeBinary(16), primary_key=True)
-    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    username: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     modified_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())

@@ -19,7 +19,7 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "email": "test@gmail.com"
+          "username": "testuser"
         }
       },
       "output": {
@@ -27,13 +27,12 @@
       }
     },
     {
-      "description": "Invalid email format",
+      "description": "Missing username field",
       "input": {
         "headers": {
           "Content-Type": "application/json"
         },
         "body": {
-          "email": "not-an-email",
           "password": "password123"
         }
       },
@@ -50,13 +49,13 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "email": "dilip@gmail.com",
+          "username": "dilip_sharma",
           "password": "password123"
         }
       },
       "mock": {
         "token": "mocked.jwt.token",
-        "user_email": "dilip@gmail.com",
+        "user_username": "dilip_sharma",
         "user_password_hash": "$2b$12$mockedhashvalue"
       },
       "output": {
@@ -76,14 +75,14 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "email": "nonexistent@gmail.com",
+          "username": "nonexistent_user",
           "password": "password123"
         }
       },
       "output": {
         "status_code": 404,
         "body": {
-          "message": "User with 'nonexistent@gmail.com' not found."
+          "message": "User with 'nonexistent_user' not found."
         }
       }
     }

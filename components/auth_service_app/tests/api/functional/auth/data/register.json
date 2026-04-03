@@ -13,12 +13,31 @@
       }
     },
     {
+      "description": "Missing username field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "test@gmail.com",
+          "first_name": "Test",
+          "last_name": "User",
+          "password": "password123",
+          "phone_number": "9876543210"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
       "description": "Missing first_name field",
       "input": {
         "headers": {
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "testuser",
           "last_name": "User",
           "email": "test@gmail.com",
           "password": "password123",
@@ -36,6 +55,7 @@
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "testuser",
           "first_name": "Test",
           "email": "test@gmail.com",
           "password": "password123",
@@ -53,6 +73,7 @@
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "testuser",
           "first_name": "Test",
           "last_name": "User",
           "password": "password123",
@@ -70,6 +91,7 @@
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "testuser",
           "first_name": "Test",
           "last_name": "User",
           "email": "test@gmail.com",
@@ -87,6 +109,7 @@
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "testuser",
           "first_name": "Test",
           "last_name": "User",
           "email": "test@gmail.com",
@@ -106,6 +129,7 @@
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "dilip_sharma",
           "first_name": "Dilip",
           "last_name": "Sharma",
           "email": "dilip@gmail.com",
@@ -120,6 +144,7 @@
       "output": {
         "status_code": 201,
         "body": {
+          "username": "dilip_sharma",
           "first_name": "Dilip",
           "last_name": "Sharma",
           "email": "dilip@gmail.com",
@@ -134,6 +159,7 @@
           "Content-Type": "application/json"
         },
         "body": {
+          "username": "john_doe",
           "first_name": "John",
           "last_name": "Doe",
           "email": "john.doe@gmail.com",
@@ -148,6 +174,7 @@
       "output": {
         "status_code": 201,
         "body": {
+          "username": "john_doe",
           "first_name": "John",
           "last_name": "Doe",
           "email": "john.doe@gmail.com",

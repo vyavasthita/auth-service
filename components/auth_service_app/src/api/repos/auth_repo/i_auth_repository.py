@@ -10,5 +10,5 @@ class IAuthRepository(IRepository[User, bytes]):
     """Abstract interface for auth-specific repository operations."""
 
     @abstractmethod
-    async def find_by_email(self, session: AsyncSession, email: str) -> User | None:
-        raise NotImplementedError("Subclasses must implement 'find_by_email'.")
+    async def find_by_username(self, session: AsyncSession, username: str) -> User | None:
+        raise NotImplementedError("Subclasses must implement 'find_by_username'.")

@@ -41,6 +41,7 @@ class AuthServiceImpl(AuthService):
     async def register(
         self,
         db_session: AsyncSession,
+        username: str,
         email: str,
         first_name: str,
         last_name: str,
@@ -52,7 +53,7 @@ class AuthServiceImpl(AuthService):
 
         user = User(
             user_id=user_id,
-            email=email,
+            username=username,
             password=Security.hash_password(password),
         )
         await self.auth_repository.save(db_session, user)
@@ -62,6 +63,7 @@ class AuthServiceImpl(AuthService):
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
+            email=email,
             user_id=user_id,
         )
         db_session.add(profile)
@@ -75,19 +77,18 @@ class AuthServiceImpl(AuthService):
         user.profile = profile
         return user
 
-    @email_format_validator
     @is_valid_user
     async def login(
         self,
         db_session: AsyncSession,
-        email: str,
+        username: str,
         password: str,
         **kwargs,
     ) -> str:
         """Authenticate a user and return a JWT token."""
         user: User = kwargs["user"]
         expire = datetime.now(UTC) + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
-        claims = {"sub": email, "exp": expire}
+        claims = {"sub": username, "exp": expire}
         token = JWTUtils.generate_auth_token(claims=claims)
 
         await self.session_repository.save(db_session, token, SessionStatus.ACTIVE, user.user_id)

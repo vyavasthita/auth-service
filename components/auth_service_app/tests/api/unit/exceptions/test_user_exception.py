@@ -24,5 +24,5 @@ async def test_user_not_found_exception():
 @pytest.mark.asyncio
 async def test_invalid_credentials_exception():
     exc = InvalidCredentialsException()
-    assert str(exc) == "Invalid email or password."
+    assert str(exc) == "Invalid username or password."
     assert exc.status_code == 401
