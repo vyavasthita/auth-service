@@ -3,18 +3,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        API_PORT: ${API_PORT}
     container_name: auth-service
     ports:
-      - "5001:5001"
+      - "${API_PORT}:${API_PORT}"
     environment:
       MYSQL_HOST: auth-service-database
-      MYSQL_DATABASE: auth_service_db
-      MYSQL_USER: root
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD}
       OTEL_EXPORTER_LOGS_ENDPOINT: "http://otel-collector:4318/v1/logs"
       OTEL_EXPORTER_TRACES_ENDPOINT: "http://otel-collector:4318/v1/traces"
       OTEL_EXPORTER_METRICS_ENDPOINT: "http://otel-collector:4318/v1/metrics"
-      OTEL_SERVICE_NAME: "auth-service"
+      OTEL_SERVICE_NAME: ${SERVICE_NAME}
+      SERVICE_NAME: ${SERVICE_NAME}
+      API_PORT: ${API_PORT}
       METRICS_MOUNT_PATH: "/metrics"
       ATTACH_PYTHON_LOGGING: "true"
       LOG_LEVEL: "INFO"
@@ -28,7 +32,7 @@ services:
       auth-service-liquibase:
         condition: service_started
     healthcheck:
-      test: curl --fail http://localhost:5001/app_health || exit 1
+      test: curl --fail http://localhost:${API_PORT}/app_health || exit 1
       start_period: 10s
       interval: 20s
     volumes:
@@ -48,7 +52,7 @@ services:
       auth-service-liquibase:
         condition: service_completed_successfully
     environment:
-      BASE_URL: http://auth-service:5001
+      BASE_URL: http://auth-service:${API_PORT}/${SERVICE_NAME}
     networks:
       - auth-service-api-network
       - observability

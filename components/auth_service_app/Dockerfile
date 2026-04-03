@@ -44,11 +44,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 # Copy the src directory
 COPY src /app/src
 
-EXPOSE 5001
+ARG API_PORT=5001
+EXPOSE ${API_PORT}
 
-CMD ["python", "-m", "uvicorn", \
-    "src.api:app", \
-    "--host", \
-    "0.0.0.0", \
-    "--port", \
-    "5001"]
+CMD ["sh", "-c", "python -m uvicorn src.api:app --host 0.0.0.0 --port ${API_PORT}"]

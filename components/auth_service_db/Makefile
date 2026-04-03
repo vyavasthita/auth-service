@@ -4,7 +4,7 @@ DB_DIR:=$(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 DB_PROJECT_ROOT:=$(DB_DIR)
 DB_DATA_DIR:=$(DB_PROJECT_ROOT)/data/database/mysql
 DB_VOLUME=auth-service-database-data
-DB_STACK_FILE:=$(abspath $(DB_PROJECT_ROOT)/../docker-compose.yaml)
+DB_STACK_FILE:=$(abspath $(DB_PROJECT_ROOT)/../../docker-compose.yaml)
 
 .PHONY: db-stop db-down db-clean db-build db-up 
 
@@ -14,8 +14,8 @@ db-stop:
 
 .PHONY: db-down
 db-down:
-	@echo "[down] docker compose -f $(COMPOSE_FILE) down --remove-orphans"
-	@docker compose -f $(COMPOSE_FILE) down --remove-orphans auth-service-liquibase auth-service-database
+	@echo "[down] docker compose -f $(DB_STACK_FILE) down --remove-orphans"
+	@docker compose -f $(DB_STACK_FILE) down --remove-orphans auth-service-liquibase auth-service-database
 
 db-clean:
 	rm -rf $(DB_DATA_DIR)

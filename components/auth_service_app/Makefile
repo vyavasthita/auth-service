@@ -9,7 +9,7 @@ APP_TEST_REPORTS_IN_PROJECT=reports
 APP_TEST_REPORTS_HOST=$(APP_PROJECT_ROOT)/reports
 APP_VENV=$(APP_PROJECT_ROOT)/.venv
 APP_VENV_BIN=$(APP_VENV)/bin
-APP_STACK_FILE:=$(abspath $(APP_PROJECT_ROOT)/../docker-compose.yaml)
+APP_STACK_FILE:=$(abspath $(APP_PROJECT_ROOT)/../../docker-compose.yaml)
 
 export PYTHONPATH := $(APP_PROJECT_ROOT):$(APP_PARENT)
 
@@ -17,8 +17,8 @@ export PYTHONPATH := $(APP_PROJECT_ROOT):$(APP_PARENT)
 
 .PHONY: app-down
 app-down:
-	@echo "[down] docker compose -f $(COMPOSE_FILE) down --remove-orphans"
-	@docker compose -f $(COMPOSE_FILE) down --remove-orphans auth-service smoke-tests
+	@echo "[down] docker compose -f $(APP_STACK_FILE) down --remove-orphans"
+	@docker compose -f $(APP_STACK_FILE) down --remove-orphans auth-service smoke-tests
 
 app-stop:
 	docker compose -f $(APP_STACK_FILE) stop auth-service 
@@ -45,8 +45,9 @@ app-build: app-deps
 	docker compose -f $(APP_STACK_FILE) build --no-cache auth-service smoke-tests
 
 app-up:
-	docker compose -f $(APP_STACK_FILE) up -d auth-service smoke-tests
-	@echo "Auth service app stack running."
+	docker compose -f $(APP_STACK_FILE) up -d auth-service
+	@echo "Auth service app running. Starting smoke tests..."
+	docker compose -f $(APP_STACK_FILE) up smoke-tests
 
 $(APP_VENV_BIN)/pytest:
 	poetry install --no-root -C $(APP_PROJECT_ROOT)

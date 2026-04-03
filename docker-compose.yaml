@@ -1,8 +1,12 @@
 include:
   - path:
-      - ./auth_service_db/docker-compose.yaml
+      - ./components/auth_service_db/docker-compose.yaml
+    env_file:
+      - ./.env
   - path:
-      - ./auth_service_app/docker-compose.yaml
+      - ./components/auth_service_app/docker-compose.yaml
+    env_file:
+      - ./.env
 
 networks:
     auth-service-api-network:

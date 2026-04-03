@@ -170,7 +170,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-auth_service_db/data/database/mysql/*
+# Local database files
+**/data/database/
 
 # Ignore test and coverage reports
-reports/
+**/reports/

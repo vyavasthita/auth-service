@@ -3,9 +3,10 @@ services:
     image: mysql:8.0.29
     container_name: auth-service-database
     ports:
-      - "3308:3306"
+      - "${MYSQL_HOST_PORT}:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${AUTH_SERVICE_MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 3s
@@ -23,20 +24,20 @@ services:
       dockerfile: Dockerfile
       args:
         MYSQL_HOST: auth-service-database
-        MYSQL_DATABASE: auth_service_db
-        MYSQL_PORT: 3306
-        MYSQL_USER: root
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_PORT: ${MYSQL_PORT}
+        MYSQL_USER: ${MYSQL_USER}
         MYSQL_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD}
-        LIQUIBASE_LOG_LEVEL: DEBUG
+        LIQUIBASE_LOG_LEVEL: ${LIQUIBASE_LOG_LEVEL}
     depends_on:
       auth-service-database:
         condition: service_healthy
     environment:
       MYSQL_HOST: auth-service-database
-      MYSQL_DATABASE: auth_service_db
-      MYSQL_USER: root
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD}
-      LIQUIBASE_LOG_LEVEL: DEBUG
+      LIQUIBASE_LOG_LEVEL: ${LIQUIBASE_LOG_LEVEL}
     volumes:
       - ./migrations/changelog:/liquibase/changelog
     networks:
