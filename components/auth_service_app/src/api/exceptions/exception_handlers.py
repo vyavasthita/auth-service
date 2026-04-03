@@ -2,11 +2,13 @@
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+
+from src.api.exceptions.token_exception import InvalidTokenException
 from src.api.exceptions.user_exception import (
+    EmailFormatException,
     InvalidCredentialsException,
     UserAlreadyExistsException,
     UserNotFoundException,
-    EmailFormatException,
 )
 
 
@@ -47,6 +49,16 @@ def register_exception_handlers(app: FastAPI):
     async def email_format_exception_handler(
         request: Request,
         exc: EmailFormatException,
+    ):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"message": exc.message},
+        )
+
+    @app.exception_handler(InvalidTokenException)
+    async def invalid_token_exception_handler(
+        request: Request,
+        exc: InvalidTokenException,
     ):
         return JSONResponse(
             status_code=exc.status_code,

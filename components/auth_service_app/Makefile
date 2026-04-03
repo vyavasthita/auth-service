@@ -13,7 +13,7 @@ APP_STACK_FILE:=$(abspath $(APP_PROJECT_ROOT)/../../docker-compose.yaml)
 
 export PYTHONPATH := $(APP_PROJECT_ROOT):$(APP_PARENT)
 
-.PHONY: app-clean app-build app-up app-stop app-test app-pytest app-coverage
+.PHONY: app-clean app-build app-up app-stop app-test app-pytest app-coverage app-fmt app-lint
 
 .PHONY: app-down
 app-down:
@@ -27,6 +27,7 @@ app-stop:
 app-clean:
 	find $(APP_PROJECT_ROOT) -type d -name '__pycache__' -exec rm -rf {} +
 	find $(APP_PROJECT_ROOT) -type d -name '.pytest_cache' -exec rm -rf {} +
+	find $(APP_PROJECT_ROOT) -type d -name '.ruff_cache' -exec rm -rf {} +
 	find $(APP_PROJECT_ROOT) -type f -name '*.pyc' -delete
 	rm -rf $(APP_VENV)
 	rm -rf $(APP_PROJECT_ROOT)/smoke_tests/.venv
@@ -68,3 +69,15 @@ app-test: app-pytest app-coverage
 	PYTHONPATH=.:.. poetry run -C $(APP_PROJECT_ROOT) coverage xml -o $(APP_TEST_REPORTS_IN_PROJECT)/coverage.xml
 	PYTHONPATH=.:.. poetry run -C $(APP_PROJECT_ROOT) coverage html -d $(APP_TEST_REPORTS_IN_PROJECT)/html
 	@echo "Auth service app tests completed."
+
+$(APP_VENV_BIN)/ruff:
+	poetry install --no-root -C $(APP_PROJECT_ROOT)
+	touch $@
+
+app-ruff: $(APP_VENV_BIN)/ruff
+
+app-fmt: app-ruff
+	poetry run -C $(APP_PROJECT_ROOT) ruff format $(APP_PROJECT_ROOT)/$(APP_SRC_ROOT) $(APP_PROJECT_ROOT)/$(APP_TEST_ROOT)
+
+app-lint: app-ruff
+	poetry run -C $(APP_PROJECT_ROOT) ruff check $(APP_PROJECT_ROOT)/$(APP_SRC_ROOT) $(APP_PROJECT_ROOT)/$(APP_TEST_ROOT)

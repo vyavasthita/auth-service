@@ -1,4 +1,3 @@
-import pytest
 from src.api.controllers import health_router
 
 

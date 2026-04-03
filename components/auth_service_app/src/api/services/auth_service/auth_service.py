@@ -1,18 +1,19 @@
+import time
 from abc import ABC, abstractmethod
 from functools import wraps
+
 import jwt
-import time
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.utils import Security, JWTUtils
-from src.api.models import User
-from src.api.repos import IAuthRepository
+
 from src.api.exceptions import (
-    UserAlreadyExistsException,
-    UserNotFoundException,
     InvalidCredentialsException,
     InvalidTokenException,
+    UserAlreadyExistsException,
+    UserNotFoundException,
 )
-from src.utils import AuthServiceLogger
+from src.api.models import User
+from src.api.repos import IAuthRepository
+from src.utils import AuthServiceLogger, JWTUtils, Security
 
 
 class AuthService(ABC):
@@ -36,6 +37,7 @@ class AuthService(ABC):
     @staticmethod
     def is_new_user(func):
         """Decorator to ensure the user does not already exist before registration."""
+
         @wraps(func)
         async def wrapper(self, db_session: AsyncSession, email: str, *args, **kwargs):
             user = await self._check_user(db_session, email)
@@ -50,6 +52,7 @@ class AuthService(ABC):
     @staticmethod
     def is_valid_user(func):
         """Decorator to ensure the user exists and password is valid before login."""
+
         @wraps(func)
         async def wrapper(self, db_session: AsyncSession, email: str, password: str):
             user = await self._check_user(db_session, email)
@@ -67,6 +70,7 @@ class AuthService(ABC):
     @staticmethod
     def is_valid_token(func):
         """Decorator to ensure the token is valid."""
+
         @wraps(func)
         async def wrapper(self, db_session: AsyncSession, token: str, **kwargs):
             self.logger.debug("Validating token.")
@@ -74,11 +78,11 @@ class AuthService(ABC):
             try:
                 claims = JWTUtils.decode_auth_token(token)
                 self.logger.debug(f"validate_token claims: {claims}")
-            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
                 self.logger.debug("Token is invalid.")
-                raise InvalidTokenException()
+                raise InvalidTokenException() from e
 
-            exp = claims.get('exp')
+            exp = claims.get("exp")
 
             if exp is not None:
                 now = int(time.time())
@@ -93,7 +97,7 @@ class AuthService(ABC):
             if user is None:
                 raise UserNotFoundException(email=claims["sub"])
 
-            kwargs['user'] = user
+            kwargs["user"] = user
 
             return await func(self, db_session, token, **kwargs)
 

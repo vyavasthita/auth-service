@@ -1,41 +1,44 @@
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from fastapi.testclient import TestClient
-from src.api.controllers import auth_router
 from fastapi import FastAPI
-from src.api.dtos import ValidateTokenRequestDTO
+from fastapi.testclient import TestClient
+
+from src.api.controllers import auth_router
+from src.api.exceptions import InvalidTokenException, register_exception_handlers
+from src.api.services import AuthServiceImpl
+
 
 @pytest.fixture
 def client():
     app = FastAPI()
+    register_exception_handlers(app)
     app.include_router(auth_router)
     return TestClient(app)
 
 
 def test_validate_token_valid(client, monkeypatch):
-    # Patch AuthServiceImpl.validate_token to always return claims
+    mock_user = MagicMock()
+    mock_user.email = "user@gmail.com"
+
     monkeypatch.setattr(
-        "src.api.services.auth_service.auth_service_impl.AuthServiceImpl.validate_token",
-        lambda self, token: {"sub": "user@example.com"}
+        AuthServiceImpl,
+        "validate_token",
+        AsyncMock(return_value=mock_user),
     )
     response = client.post("/validate-token", json={"token": "validtoken"})
     assert response.status_code == 200
     data = response.json()
     assert data["is_valid"] is True
-    assert data["user_id"] == "user@example.com"
+    assert data["email"] == "user@gmail.com"
     assert data["message"] == "Token is valid."
 
 
 def test_validate_token_invalid(client, monkeypatch):
-    # Patch AuthServiceImpl.validate_token to raise Exception
-    def raise_exc(self, token):
-        raise Exception("Invalid or expired token.")
     monkeypatch.setattr(
-        "src.api.services.auth_service.auth_service_impl.AuthServiceImpl.validate_token",
-        raise_exc
+        AuthServiceImpl,
+        "validate_token",
+        AsyncMock(side_effect=InvalidTokenException()),
     )
     response = client.post("/validate-token", json={"token": "badtoken"})
-    assert response.status_code == 200
-    data = response.json()
-    assert data["is_valid"] is False
-    assert data["user_id"] is None
-    assert "Invalid or expired token" in data["message"]
+    assert response.status_code == 401

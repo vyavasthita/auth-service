@@ -27,6 +27,8 @@ help:
 	@echo "  deps         regenerate backend/poetry.lock after toolkit changes"
 	@echo "  ps           show container status"
 	@echo "  logs         follow docker compose logs"
+	@echo "  fmt          format code with ruff"
+	@echo "  lint         lint code with ruff"
 	@echo ""
 	@echo "Choose one option!"
 
@@ -107,3 +109,11 @@ logs:
 test:
 	$(MAKE) -C components/auth_service_app app-test
 	@echo "Auth service tested."
+
+.PHONY: fmt
+fmt:
+	$(MAKE) -C components/auth_service_app app-fmt
+
+.PHONY: lint
+lint:
+	$(MAKE) -C components/auth_service_app app-lint

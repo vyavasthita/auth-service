@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 T = TypeVar("T")
 ID = TypeVar("ID")
@@ -12,11 +11,11 @@ class IRepository(ABC, Generic[T, ID]):
     """Generic repository interface — mirrors JPA's JpaRepository<T, ID>."""
 
     @abstractmethod
-    async def get_by_id(self, session: AsyncSession, entity_id: ID) -> Optional[T]:
+    async def get_by_id(self, session: AsyncSession, entity_id: ID) -> T | None:
         raise NotImplementedError("Subclasses must implement 'get_by_id'.")
 
     @abstractmethod
-    async def get_all(self, session: AsyncSession) -> List[T]:
+    async def get_all(self, session: AsyncSession) -> list[T]:
         raise NotImplementedError("Subclasses must implement 'get_all'.")
 
     @abstractmethod

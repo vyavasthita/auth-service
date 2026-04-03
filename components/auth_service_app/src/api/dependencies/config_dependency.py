@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 from src.api.config import Settings
 
 

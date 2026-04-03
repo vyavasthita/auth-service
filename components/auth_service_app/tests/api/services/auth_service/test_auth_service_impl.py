@@ -1,6 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.api.exceptions.user_exception import InvalidCredentialsException, UserNotFoundException
 from src.api.models import User
 from src.api.services import AuthServiceImpl

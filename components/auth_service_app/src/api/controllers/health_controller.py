@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from instrumentation_hub_fastapi import rate_limited_log
-from src.utils import AuthServiceLogger
+
 from src.api.dependencies import DatabaseDependency
 from src.api.dependencies.config_dependency import Config
-
+from src.utils import AuthServiceLogger
 
 logger = AuthServiceLogger.get_logger()
 

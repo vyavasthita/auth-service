@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.utils import AuthServiceLogger
+
+from src.api.dependencies import DatabaseDependency
 from src.api.dtos import (
-    RegisterUserRequestDTO,
-    RegisterUserResponseDTO,
     LoginUserRequestDTO,
     LoginUserResponseDTO,
+    RegisterUserRequestDTO,
+    RegisterUserResponseDTO,
     ValidateTokenRequestDTO,
     ValidateTokenResponseDTO,
 )
 from src.api.models import User
-from src.api.dependencies import DatabaseDependency
 from src.api.services import AuthService, AuthServiceImpl
-
+from src.utils import AuthServiceLogger
 
 logger = AuthServiceLogger.get_logger()
 
@@ -79,7 +79,5 @@ async def validate_token(
     auth_service: AuthService = Depends(AuthServiceImpl),
 ) -> ValidateTokenResponseDTO:
     """Validate a JWT token and return claims if valid."""
-    user: User = await auth_service.validate_token(
-        db_session=db_session, token=request.token
-    )
+    user: User = await auth_service.validate_token(db_session=db_session, token=request.token)
     return ValidateTokenResponseDTO(email=user.email, message="Token is valid.")

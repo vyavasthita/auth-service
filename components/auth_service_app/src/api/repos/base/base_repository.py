@@ -1,12 +1,11 @@
 import logging
-from typing import List, Optional, Type
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.exceptions.db_exception import DBException, DBIntegrityException, DBOperationalException
-from src.api.repos.base.i_repository import ID, T, IRepository
+from src.api.repos.base.i_repository import ID, IRepository, T
 from src.utils.auth_service_logger import AuthServiceLogger
 
 
@@ -15,15 +14,15 @@ class BaseRepository(IRepository[T, ID]):
 
     _logger: logging.Logger = AuthServiceLogger.get_logger()
 
-    def __init__(self, model: Type[T]):
+    def __init__(self, model: type[T]):
         self._model = model
 
     @property
-    def model(self) -> Type[T]:
+    def model(self) -> type[T]:
         return self._model
 
     @model.setter
-    def model(self, value: Type[T]) -> None:
+    def model(self, value: type[T]) -> None:
         self._model = value
 
     @property
@@ -52,13 +51,13 @@ class BaseRepository(IRepository[T, ID]):
         self._logger.error(f"Unexpected error during {operation} on {entity_name}: {error}")
         raise DBException("Unexpected error.")
 
-    async def get_by_id(self, session: AsyncSession, entity_id: ID) -> Optional[T]:
+    async def get_by_id(self, session: AsyncSession, entity_id: ID) -> T | None:
         try:
             return await session.get(self._model, entity_id)
         except Exception as error:
             self._handle_db_error("get_by_id", error)
 
-    async def get_all(self, session: AsyncSession) -> List[T]:
+    async def get_all(self, session: AsyncSession) -> list[T]:
         try:
             result = await session.execute(select(self._model))
             return list(result.scalars().all())

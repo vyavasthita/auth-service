@@ -1,8 +1,10 @@
-from threading import Lock
 import logging
 import ssl
+from threading import Lock
 from urllib.parse import quote_plus
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+
 from src.api.dependencies.config_dependency import Config
 from src.utils.auth_service_logger import AuthServiceLogger
 

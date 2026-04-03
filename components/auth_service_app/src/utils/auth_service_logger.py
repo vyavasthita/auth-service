@@ -1,5 +1,6 @@
 import logging
 from threading import Lock
+
 from src.api.dependencies.config_dependency import Config
 
 
@@ -18,9 +19,7 @@ class AuthServiceLogger:
                     logger.propagate = True
                     if not logger.handlers and logger.name != "root":
                         handler = logging.StreamHandler()
-                        formatter = logging.Formatter(
-                            "%(asctime)s %(levelname)s [%(name)s] %(message)s"
-                        )
+                        formatter = logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s")
                         handler.setFormatter(formatter)
                         logger.addHandler(handler)
                     cls._instance = logger

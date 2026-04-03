@@ -31,8 +31,45 @@ coverage = "^7.13.1"
 anyio = "^4.12.1"
 httpx = "^0.28.1"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.0"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults (needed for Depends())
+    "N802",   # function name should be lowercase (Config() is intentional)
+    "N818",   # exception name should end with Error (BaseException is intentional)
+    "TCH001", # move import into type-checking block (breaks FastAPI runtime)
+    "TC001",  # move import into type-checking block (breaks FastAPI runtime)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # re-exports in barrel files
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

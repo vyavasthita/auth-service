@@ -3,6 +3,7 @@ FastAPI application initialization with modular OpenTelemetry observability setu
 """
 
 from fastapi import FastAPI
+
 from src.api.bootstrap import AppFactory, AppInitializer
 
 initializer = AppInitializer()

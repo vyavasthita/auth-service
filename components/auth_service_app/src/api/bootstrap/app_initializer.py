@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from src.api.bootstrap.instrumentation_setup import InstrumentationSetup
+
 from src.api.bootstrap.cors_registrar import CORSRegistrar
+from src.api.bootstrap.instrumentation_setup import InstrumentationSetup
 from src.api.bootstrap.router_registrar import RouterRegistrar
 from src.api.exceptions import register_exception_handlers
 

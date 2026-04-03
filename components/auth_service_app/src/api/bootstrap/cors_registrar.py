@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.dependencies.config_dependency import Config
+
 from src.api.constants import constants
+from src.api.dependencies.config_dependency import Config
 
 
 class CORSRegistrar:

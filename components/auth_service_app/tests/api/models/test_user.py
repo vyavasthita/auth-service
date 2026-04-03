@@ -1,5 +1,7 @@
 import pytest
+
 from src.api.models import User
+
 
 @pytest.mark.asyncio
 async def test_user_model_import():

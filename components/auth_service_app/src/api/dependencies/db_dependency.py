@@ -1,11 +1,12 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from src.api.dependencies.config_dependency import Config
+from src.api.exceptions import DBException
 from src.api.repos import DatabaseEngine
 from src.utils import AuthServiceLogger
-from src.api.exceptions import DBException
-from src.api.dependencies.config_dependency import Config
-
 
 logger = AuthServiceLogger.get_logger()
 
@@ -15,7 +16,7 @@ _session_local = async_sessionmaker(bind=_engine, expire_on_commit=False)
 
 class DatabaseDependency:
     @staticmethod
-    async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    async def get_db_session() -> AsyncGenerator[AsyncSession]:
         async with _session_local() as db:
             logger.debug(f"DB session created: {id(db)}")
             try:
@@ -30,9 +31,7 @@ class DatabaseDependency:
 
     async def check_connectivity(self, db: AsyncSession) -> None:
         try:
-            statement = text(
-                "SELECT table_name FROM information_schema.tables WHERE table_schema = :schema"
-            )
+            statement = text("SELECT table_name FROM information_schema.tables WHERE table_schema = :schema")
             result = await db.execute(statement, {"schema": Config().MYSQL_DATABASE})
             records = result.all()
             logger.debug(f"Tables: {[record[0] for record in records]}")
@@ -40,7 +39,7 @@ class DatabaseDependency:
             logger.error(f"Failed DB check: {error}")
             raise DBException(
                 message="Internal Server Error",
-            )
+            ) from error
 
     async def __call__(self) -> None:
         logger.info("Validating database connectivity...")

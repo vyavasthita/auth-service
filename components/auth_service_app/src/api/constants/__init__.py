@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from .cors_constants import CORSConstants
+
 from .app_constants import AppConstants
+from .cors_constants import CORSConstants
 
 
 @dataclass(frozen=True)
@@ -9,6 +10,7 @@ class Constants(
     AppConstants,
 ):
     """Root constants class — inherits all child constant modules."""
+
     pass
 
 

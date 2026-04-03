@@ -1,5 +1,7 @@
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
 from src.api.dependencies.config_dependency import Config
 from src.api.repos.db import DatabaseEngine
 

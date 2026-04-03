@@ -14,8 +14,8 @@ class Security:
             str: The hashed password.
         """
         salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed.decode('utf-8')
+        hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
+        return hashed.decode("utf-8")
 
     @staticmethod
     def verify_password(password: str, hashed: str) -> bool:
@@ -29,4 +29,4 @@ class Security:
         Returns:
             bool: True if the password matches, False otherwise.
         """
-        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
