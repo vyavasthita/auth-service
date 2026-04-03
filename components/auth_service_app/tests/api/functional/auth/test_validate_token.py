@@ -1,0 +1,82 @@
+"""
+Functional tests for POST /validate-token endpoint.
+
+Test data is loaded from ./data/validate_token.json.
+Each test case is parameterized via @pytest.mark.test_section.
+"""
+
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import httpx
+import jwt
+import pytest
+
+from src.api.models import User
+from tests.api.common.file_helper import namespace_to_dict
+
+TEST_DATA_FILE = "validate_token.json"
+BASE_API_URL = "/validate-token"
+
+
+@pytest.mark.test_section("invalid_request_validation")
+@pytest.mark.asyncio
+async def test_post_validate_token_invalid_request(async_client: httpx.AsyncClient, test_case):
+    """Should return 422 for missing/invalid fields."""
+    response = await async_client.post(
+        BASE_API_URL,
+        headers=namespace_to_dict(test_case.input.headers),
+        json=namespace_to_dict(test_case.input.body),
+    )
+    assert response.status_code == test_case.output.status_code
+
+
+@pytest.mark.test_section("valid_token_validation")
+@pytest.mark.asyncio
+async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_case):
+    """Should return 200 with token validity details."""
+    mock_user = MagicMock(spec=User)
+    mock_user.email = test_case.mock.email
+
+    mock_claims = namespace_to_dict(test_case.mock.claims)
+
+    with (
+        patch(
+            "src.api.services.auth_service.auth_service.JWTUtils.decode_auth_token",
+            return_value=mock_claims,
+        ),
+        patch(
+            "src.api.repos.auth_repo.auth_repository.AuthRepository.find_by_email",
+            new_callable=AsyncMock,
+            return_value=mock_user,
+        ),
+    ):
+        response = await async_client.post(
+            BASE_API_URL,
+            headers=namespace_to_dict(test_case.input.headers),
+            json=namespace_to_dict(test_case.input.body),
+        )
+
+    assert response.status_code == test_case.output.status_code
+
+    if hasattr(test_case.output, "body"):
+        assert response.json() == namespace_to_dict(test_case.output.body)
+
+
+@pytest.mark.test_section("invalid_token_validation")
+@pytest.mark.asyncio
+async def test_post_validate_token_invalid(async_client: httpx.AsyncClient, test_case):
+    """Should return 401 for invalid/expired tokens."""
+    with patch(
+        "src.api.services.auth_service.auth_service.JWTUtils.decode_auth_token",
+        side_effect=jwt.InvalidTokenError("Invalid token"),
+    ):
+        response = await async_client.post(
+            BASE_API_URL,
+            headers=namespace_to_dict(test_case.input.headers),
+            json=namespace_to_dict(test_case.input.body),
+        )
+
+    assert response.status_code == test_case.output.status_code
+
+    if hasattr(test_case.output, "body"):
+        assert response.json() == namespace_to_dict(test_case.output.body)

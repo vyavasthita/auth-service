@@ -1,0 +1,132 @@
+{
+  "invalid_request_validation": [
+    {
+      "description": "Missing all required fields",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {}
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing name field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "test@gmail.com",
+          "password": "password123",
+          "phone_number": "9876543210"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing email field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Test User",
+          "password": "password123",
+          "phone_number": "9876543210"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing password field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Test User",
+          "email": "test@gmail.com",
+          "phone_number": "9876543210"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing phone_number field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Test User",
+          "email": "test@gmail.com",
+          "password": "password123"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    }
+  ],
+  "valid_request_validation": [
+    {
+      "description": "Register user with valid data",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Dilip Sharma",
+          "email": "dilip@gmail.com",
+          "password": "password123",
+          "phone_number": "9876543210"
+        }
+      },
+      "mock": {
+        "uuid": "851cf614499341aeb6f22c20f193c9f1"
+      },
+      "output": {
+        "status_code": 201,
+        "body": {
+          "name": "Dilip Sharma",
+          "email": "dilip@gmail.com",
+          "phone_number": "9876543210"
+        }
+      }
+    },
+    {
+      "description": "Register another user with valid data",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "John Doe",
+          "email": "john.doe@gmail.com",
+          "password": "securepass456",
+          "phone_number": "1234567890"
+        }
+      },
+      "mock": {
+        "uuid": "a1b2c3d4e5f647a8b9c0d1e2f3a4b5c6"
+      },
+      "output": {
+        "status_code": 201,
+        "body": {
+          "name": "John Doe",
+          "email": "john.doe@gmail.com",
+          "phone_number": "1234567890"
+        }
+      }
+    }
+  ]
+}

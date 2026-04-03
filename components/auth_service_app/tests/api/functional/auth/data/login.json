@@ -1,0 +1,91 @@
+{
+  "invalid_request_validation": [
+    {
+      "description": "Missing all required fields",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {}
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing password field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "test@gmail.com"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Invalid email format",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "not-an-email",
+          "password": "password123"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    }
+  ],
+  "valid_request_validation": [
+    {
+      "description": "Login with valid credentials",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "dilip@gmail.com",
+          "password": "password123"
+        }
+      },
+      "mock": {
+        "token": "mocked.jwt.token",
+        "user_email": "dilip@gmail.com",
+        "user_password_hash": "$2b$12$mockedhashvalue"
+      },
+      "output": {
+        "status_code": 200,
+        "body": {
+          "access_token": "mocked.jwt.token",
+          "token_type": "bearer"
+        }
+      }
+    }
+  ],
+  "user_not_found_validation": [
+    {
+      "description": "Login with non-existent user",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "nonexistent@gmail.com",
+          "password": "password123"
+        }
+      },
+      "output": {
+        "status_code": 404,
+        "body": {
+          "message": "User with 'nonexistent@gmail.com' not found."
+        }
+      }
+    }
+  ]
+}

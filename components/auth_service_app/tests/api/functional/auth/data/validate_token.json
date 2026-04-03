@@ -1,0 +1,63 @@
+{
+  "invalid_request_validation": [
+    {
+      "description": "Missing token field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {}
+      },
+      "output": {
+        "status_code": 422
+      }
+    }
+  ],
+  "valid_token_validation": [
+    {
+      "description": "Validate a valid token",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "token": "valid.jwt.token"
+        }
+      },
+      "mock": {
+        "email": "dilip@gmail.com",
+        "claims": {
+          "sub": "dilip@gmail.com",
+          "exp": 9999999999
+        }
+      },
+      "output": {
+        "status_code": 200,
+        "body": {
+          "is_valid": true,
+          "email": "dilip@gmail.com",
+          "message": "Token is valid."
+        }
+      }
+    }
+  ],
+  "invalid_token_validation": [
+    {
+      "description": "Validate an expired/invalid token",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "token": "expired.jwt.token"
+        }
+      },
+      "output": {
+        "status_code": 401,
+        "body": {
+          "message": "Invalid or expired token."
+        }
+      }
+    }
+  ]
+}

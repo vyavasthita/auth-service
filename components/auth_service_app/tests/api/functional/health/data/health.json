@@ -1,0 +1,13 @@
+{
+  "health_check_validation": [
+    {
+      "description": "Health endpoint returns 200",
+      "input": {
+        "headers": {}
+      },
+      "output": {
+        "status_code": 200
+      }
+    }
+  ]
+}
