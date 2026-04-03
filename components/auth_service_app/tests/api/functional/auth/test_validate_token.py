@@ -1,5 +1,5 @@
 """
-Functional tests for POST /validate-token endpoint.
+Functional tests for POST /validate endpoint.
 
 Test data is loaded from ./data/validate_token.json.
 Each test case is parameterized via @pytest.mark.test_section.
@@ -18,18 +18,6 @@ TEST_DATA_FILE = "validate_token.json"
 BASE_API_URL = "/validate"
 
 
-@pytest.mark.test_section("invalid_request_validation")
-@pytest.mark.asyncio
-async def test_post_validate_token_invalid_request(async_client: httpx.AsyncClient, test_case):
-    """Should return 422 for missing/invalid fields."""
-    response = await async_client.post(
-        BASE_API_URL,
-        headers=namespace_to_dict(test_case.input.headers),
-        json=namespace_to_dict(test_case.input.body),
-    )
-    assert response.status_code == test_case.output.status_code
-
-
 @pytest.mark.test_section("valid_token_validation")
 @pytest.mark.asyncio
 async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_case):
@@ -39,10 +27,11 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
     mock_user.email = test_case.mock.email
 
     mock_claims = namespace_to_dict(test_case.mock.claims)
+    cookies = namespace_to_dict(test_case.input.cookie)
 
     with (
         patch(
-            "src.api.services.auth_service.auth_service.JWTUtils.decode_auth_token",
+            "src.api.services.auth_service.auth_decorators.JWTUtils.decode_auth_token",
             return_value=mock_claims,
         ),
         patch(
@@ -54,8 +43,20 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
         response = await async_client.post(
             BASE_API_URL,
             headers=namespace_to_dict(test_case.input.headers),
-            json=namespace_to_dict(test_case.input.body),
+            cookies=cookies,
         )
+
+    assert response.status_code == test_case.output.status_code
+
+
+@pytest.mark.test_section("missing_cookie_validation")
+@pytest.mark.asyncio
+async def test_post_validate_token_missing_cookie(async_client: httpx.AsyncClient, test_case):
+    """Should return 401 when no cookie is provided."""
+    response = await async_client.post(
+        BASE_API_URL,
+        headers=namespace_to_dict(test_case.input.headers),
+    )
 
     assert response.status_code == test_case.output.status_code
 
@@ -64,14 +65,16 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
 @pytest.mark.asyncio
 async def test_post_validate_token_invalid(async_client: httpx.AsyncClient, test_case):
     """Should return 401 for invalid/expired tokens."""
+    cookies = namespace_to_dict(test_case.input.cookie)
+
     with patch(
-        "src.api.services.auth_service.auth_service.JWTUtils.decode_auth_token",
+        "src.api.services.auth_service.auth_decorators.JWTUtils.decode_auth_token",
         side_effect=jwt.InvalidTokenError("Invalid token"),
     ):
         response = await async_client.post(
             BASE_API_URL,
             headers=namespace_to_dict(test_case.input.headers),
-            json=namespace_to_dict(test_case.input.body),
+            cookies=cookies,
         )
 
     assert response.status_code == test_case.output.status_code

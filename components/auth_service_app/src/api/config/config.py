@@ -1,4 +1,5 @@
 from src.api.config.app_config import AppSettings
+from src.api.config.cookie_config import CookieSettings
 from src.api.config.cors_config import CORSSettings
 from src.api.config.db_pool_config import DBPoolSettings
 from src.api.config.jwt_config import JWTSettings
@@ -9,6 +10,7 @@ from src.api.config.open_api_config import OpenAPISettings
 
 class Settings(
     CORSSettings,
+    CookieSettings,
     OpenAPISettings,
     AppSettings,
     MySQLSettings,

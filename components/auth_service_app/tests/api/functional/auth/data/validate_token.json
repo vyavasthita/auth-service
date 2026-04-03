@@ -1,18 +1,4 @@
 {
-  "invalid_request_validation": [
-    {
-      "description": "Missing token field",
-      "input": {
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": {}
-      },
-      "output": {
-        "status_code": 422
-      }
-    }
-  ],
   "valid_token_validation": [
     {
       "description": "Validate a valid token",
@@ -20,8 +6,8 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "body": {
-          "token": "valid.jwt.token"
+        "cookie": {
+          "access_token": "valid.jwt.token"
         }
       },
       "mock": {
@@ -41,6 +27,22 @@
       }
     }
   ],
+  "missing_cookie_validation": [
+    {
+      "description": "Validate without cookie",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "output": {
+        "status_code": 401,
+        "body": {
+          "message": "Invalid or expired token."
+        }
+      }
+    }
+  ],
   "invalid_token_validation": [
     {
       "description": "Validate an expired/invalid token",
@@ -48,8 +50,8 @@
         "headers": {
           "Content-Type": "application/json"
         },
-        "body": {
-          "token": "expired.jwt.token"
+        "cookie": {
+          "access_token": "expired.jwt.token"
         }
       },
       "output": {

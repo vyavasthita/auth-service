@@ -44,7 +44,7 @@ async def test_post_login_valid_request(async_client: httpx.AsyncClient, test_ca
             return_value=mock_user,
         ),
         patch(
-            "src.api.services.auth_service.auth_service.Security.verify_password",
+            "src.api.services.auth_service.auth_decorators.Security.verify_password",
             return_value=True,
         ),
         patch(
@@ -62,6 +62,9 @@ async def test_post_login_valid_request(async_client: httpx.AsyncClient, test_ca
 
     if hasattr(test_case.output, "body"):
         assert response.json() == namespace_to_dict(test_case.output.body)
+
+    if hasattr(test_case.output, "cookie"):
+        assert test_case.output.cookie in response.cookies
 
 
 @pytest.mark.test_section("user_not_found_validation")

@@ -5,7 +5,7 @@ import pytest
 async def test_validate_token_smoke(base_url, async_client):
     register_url = f"{base_url}/register"
     login_url = f"{base_url}/login"
-    validate_url = f"{base_url}/validate-token"
+    validate_url = f"{base_url}/validate"
 
     shared_email = "smoke-validate-user@gmail.com"
     password = "smokepass123"
@@ -31,9 +31,12 @@ async def test_validate_token_smoke(base_url, async_client):
         f"Login failed: {login_response.status_code}"
     )
 
-    token = login_response.json()["access_token"]
+    token = login_response.cookies["access_token"]
 
-    validate_response = await async_client.post(validate_url, json={"token": token})
+    validate_response = await async_client.post(
+        validate_url,
+        cookies={"access_token": token},
+    )
     assert validate_response.status_code == 200, (
         f"Validate token failed: {validate_response.status_code}"
     )

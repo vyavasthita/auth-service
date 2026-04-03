@@ -16,3 +16,4 @@ class User(Base):
     modified_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     profile: Mapped["UserProfile"] = relationship("UserProfile", back_populates="user", uselist=False)  # noqa: F821
+    sessions: Mapped[list["UserSession"]] = relationship("UserSession", back_populates="user")  # noqa: F821

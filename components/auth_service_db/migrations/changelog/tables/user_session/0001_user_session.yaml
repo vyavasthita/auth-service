@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0001-user-session"
+      author: dilipsharma
+      changes:
+        - createTable:
+            tableName: users_sessions
+            columns:
+              - column:
+                  name: user_session_id
+                  type: BINARY(16)
+                  autoIncrement: false
+                  remarks: The primary key of the table
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: token
+                  type: TEXT
+                  remarks: JWT token for the session
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: ENUM('ACTIVE', 'INACTIVE', 'EXPIRED', 'REVOKED')
+                  remarks: Status of the session
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BINARY(16)
+                  remarks: Foreign key to users table
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_users_sessions_user_id
+                    references: users(user_id)
+              - column:
+                  name: created_at
+                  type: datetime
+                  remarks: Timestamp when the session was created
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified_at
+                  type: datetime
+                  remarks: Timestamp when the session was last modified
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+          remarks: Users sessions table
+          ifNotExists: true

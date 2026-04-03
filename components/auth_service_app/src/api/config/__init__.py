@@ -1,5 +1,6 @@
 from .app_config import AppSettings
 from .config import Settings
+from .cookie_config import CookieSettings
 from .cors_config import CORSSettings
 from .db_pool_config import DBPoolSettings
 from .jwt_config import JWTSettings

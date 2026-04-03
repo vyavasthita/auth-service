@@ -33,5 +33,5 @@ async def test_login_user(base_url, async_client):
     )
 
     body = login_response.json()
-    assert body.get("access_token"), "access_token missing in response"
-    assert body.get("token_type") == "bearer"
+    assert body.get("message") == "Login successful."
+    assert "access_token" in login_response.cookies, "access_token cookie missing in response"

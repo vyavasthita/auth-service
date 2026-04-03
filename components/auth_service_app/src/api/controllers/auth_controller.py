@@ -1,21 +1,23 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Cookie, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import DatabaseDependency
+from src.api.dependencies.config_dependency import Config
 from src.api.dtos import (
     LoginUserRequestDTO,
     LoginUserResponseDTO,
     RegisterUserRequestDTO,
     RegisterUserResponseDTO,
-    ValidateTokenRequestDTO,
     ValidateTokenResponseDTO,
 )
+from src.api.exceptions import InvalidTokenException
 from src.api.models import User
 from src.api.services import AuthService, AuthServiceImpl
 from src.utils import AuthServiceLogger
 
 logger = AuthServiceLogger.get_logger()
 
+config = Config()
 
 auth_router = APIRouter(
     prefix="",
@@ -58,18 +60,29 @@ async def register(
 )
 async def login(
     request: LoginUserRequestDTO,
+    response: Response,
     db_session: AsyncSession = Depends(DatabaseDependency.get_db_session),
     auth_service: AuthService = Depends(AuthServiceImpl),
 ) -> LoginUserResponseDTO:
-    """Authenticate a user and return an access token."""
+    """Authenticate a user and set an access token cookie."""
     logger.info(f"Login endpoint called for email: {request.email}")
+
     token: str = await auth_service.login(
         db_session=db_session,
         email=request.email,
         password=request.password,
     )
+    response.set_cookie(
+        key=config.COOKIE_NAME,
+        value=token,
+        httponly=config.COOKIE_HTTPONLY,
+        secure=config.COOKIE_SECURE,
+        samesite=config.COOKIE_SAMESITE,
+        path=config.COOKIE_PATH,
+        max_age=config.TOKEN_EXPIRE_MINUTES * 60,
+    )
     logger.info(f"User logged in: {request.email}")
-    return LoginUserResponseDTO(access_token=token)
+    return LoginUserResponseDTO()
 
 
 @auth_router.post(
@@ -77,10 +90,28 @@ async def login(
     response_model=ValidateTokenResponseDTO,
 )
 async def validate_token(
-    request: ValidateTokenRequestDTO,
     db_session: AsyncSession = Depends(DatabaseDependency.get_db_session),
     auth_service: AuthService = Depends(AuthServiceImpl),
+    access_token: str | None = Cookie(default=None),
 ) -> ValidateTokenResponseDTO:
-    """Validate a JWT token and return claims if valid."""
-    user: User = await auth_service.validate_token(db_session=db_session, token=request.token)
+    """Validate a JWT token from the cookie and return claims if valid."""
+    if not access_token:
+        raise InvalidTokenException()
+    user: User = await auth_service.validate_token(db_session=db_session, token=access_token)
     return ValidateTokenResponseDTO(user_id=user.user_id, email=user.email, message="Token is valid.")
+
+
+@auth_router.post(
+    "/logout",
+    status_code=status.HTTP_200_OK,
+)
+async def logout(response: Response) -> dict:
+    """Clear the access token cookie."""
+    response.delete_cookie(
+        key=config.COOKIE_NAME,
+        httponly=config.COOKIE_HTTPONLY,
+        secure=config.COOKIE_SECURE,
+        samesite=config.COOKIE_SAMESITE,
+        path=config.COOKIE_PATH,
+    )
+    return {"message": "Logged out successfully."}

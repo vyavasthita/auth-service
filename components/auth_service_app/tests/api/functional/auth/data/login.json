@@ -62,9 +62,9 @@
       "output": {
         "status_code": 200,
         "body": {
-          "access_token": "mocked.jwt.token",
-          "token_type": "bearer"
-        }
+          "message": "Login successful."
+        },
+        "cookie": "access_token"
       }
     }
   ],

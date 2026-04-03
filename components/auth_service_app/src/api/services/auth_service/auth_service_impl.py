@@ -13,6 +13,7 @@ from src.api.repos import AuthRepository, IAuthRepository
 from src.utils import JWTUtils, Security
 from src.utils.email_validator import email_format_validator
 
+from .auth_decorators import is_new_user, is_valid_token, is_valid_user
 from .auth_service import AuthService
 
 
@@ -26,7 +27,7 @@ class AuthServiceImpl(AuthService):
         super().__init__(auth_repository)
 
     @email_format_validator
-    @AuthService.is_new_user
+    @is_new_user
     async def register(
         self,
         db_session: AsyncSession,
@@ -65,7 +66,7 @@ class AuthServiceImpl(AuthService):
         return user
 
     @email_format_validator
-    @AuthService.is_valid_user
+    @is_valid_user
     async def login(
         self,
         db_session: AsyncSession,
@@ -75,9 +76,9 @@ class AuthServiceImpl(AuthService):
         """Authenticate a user and return a JWT token."""
         expire = datetime.now(UTC) + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
         claims = {"sub": email, "exp": expire}
-        return JWTUtils.generate_auth_token(claims=claims)
+        token = JWTUtils.generate_auth_token(claims=claims)
 
-    @AuthService.is_valid_token
+    @is_valid_token
     async def validate_token(
         self,
         db_session: AsyncSession,
