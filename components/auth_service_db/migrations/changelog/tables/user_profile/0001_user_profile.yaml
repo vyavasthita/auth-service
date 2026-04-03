@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0001-user-profile"
+      author: dilipsharma
+      changes:
+        - createTable:
+            tableName: user_profiles
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  autoIncrement: false
+                  remarks: The primary key of the table
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: first_name
+                  type: varchar(255)
+                  remarks: First name of the user
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(255)
+                  remarks: Last name of the user
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(255)
+                  remarks: Phone number of the user
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: user_id
+                  type: BINARY(16)
+                  remarks: Foreign key to users table
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_profiles_user_id
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: datetime
+                  remarks: Timestamp when the profile was created
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified_at
+                  type: datetime
+                  remarks: Timestamp when the profile was last modified
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+          remarks: User profiles table
+          ifNotExists: true

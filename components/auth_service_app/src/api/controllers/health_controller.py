@@ -24,5 +24,5 @@ async def health_check() -> str:
 
     if health_check._can_log:
         logger.info(message)
-        
+
     return message

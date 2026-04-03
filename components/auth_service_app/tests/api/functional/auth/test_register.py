@@ -33,12 +33,13 @@ async def test_post_register_invalid_request(async_client: httpx.AsyncClient, te
 @pytest.mark.asyncio
 async def test_post_register_valid_request(async_client: httpx.AsyncClient, test_case):
     """Should return 201 with registered user details."""
-    mock_uuid = UUID(test_case.mock.uuid)
+    mock_user_uuid = UUID(test_case.mock.uuid)
+    mock_profile_uuid = UUID(test_case.mock.profile_uuid)
 
     with (
         patch(
             "src.api.services.auth_service.auth_service_impl.uuid4",
-            return_value=mock_uuid,
+            side_effect=[mock_user_uuid, mock_profile_uuid],
         ),
         patch(
             "src.api.services.auth_service.auth_service_impl.Security.hash_password",

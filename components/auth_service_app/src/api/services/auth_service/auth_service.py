@@ -108,7 +108,8 @@ class AuthService(ABC):
         self,
         db_session: AsyncSession,
         email: str,
-        name: str,
+        first_name: str,
+        last_name: str,
         password: str,
         phone_number: str,
     ) -> User:

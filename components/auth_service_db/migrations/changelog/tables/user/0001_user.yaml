@@ -15,12 +15,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: name
-                  type: varchar(255)
-                  remarks: Name of user
-                  constraints:
-                    nullable: false
-              - column:
                   name: email
                   type: varchar(255)
                   remarks: Email of user
@@ -31,12 +25,6 @@ databaseChangeLog:
                   name: password
                   type: varchar(255)
                   remarks: Password of user
-                  constraints:
-                    nullable: false
-              - column:
-                  name: phone_number
-                  type: varchar(255)
-                  remarks: Phone number of user
                   constraints:
                     nullable: false
               - column:

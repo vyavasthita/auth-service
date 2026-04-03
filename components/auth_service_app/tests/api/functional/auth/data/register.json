@@ -13,12 +13,30 @@
       }
     },
     {
-      "description": "Missing name field",
+      "description": "Missing first_name field",
       "input": {
         "headers": {
           "Content-Type": "application/json"
         },
         "body": {
+          "last_name": "User",
+          "email": "test@gmail.com",
+          "password": "password123",
+          "phone_number": "9876543210"
+        }
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing last_name field",
+      "input": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "first_name": "Test",
           "email": "test@gmail.com",
           "password": "password123",
           "phone_number": "9876543210"
@@ -35,7 +53,8 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "name": "Test User",
+          "first_name": "Test",
+          "last_name": "User",
           "password": "password123",
           "phone_number": "9876543210"
         }
@@ -51,7 +70,8 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "name": "Test User",
+          "first_name": "Test",
+          "last_name": "User",
           "email": "test@gmail.com",
           "phone_number": "9876543210"
         }
@@ -67,7 +87,8 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "name": "Test User",
+          "first_name": "Test",
+          "last_name": "User",
           "email": "test@gmail.com",
           "password": "password123"
         }
@@ -85,19 +106,22 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "name": "Dilip Sharma",
+          "first_name": "Dilip",
+          "last_name": "Sharma",
           "email": "dilip@gmail.com",
           "password": "password123",
           "phone_number": "9876543210"
         }
       },
       "mock": {
-        "uuid": "851cf614499341aeb6f22c20f193c9f1"
+        "uuid": "851cf614499341aeb6f22c20f193c9f1",
+        "profile_uuid": "c1d2e3f4a5b647c8d9e0f1a2b3c4d5e6"
       },
       "output": {
         "status_code": 201,
         "body": {
-          "name": "Dilip Sharma",
+          "first_name": "Dilip",
+          "last_name": "Sharma",
           "email": "dilip@gmail.com",
           "phone_number": "9876543210"
         }
@@ -110,19 +134,22 @@
           "Content-Type": "application/json"
         },
         "body": {
-          "name": "John Doe",
+          "first_name": "John",
+          "last_name": "Doe",
           "email": "john.doe@gmail.com",
           "password": "securepass456",
           "phone_number": "1234567890"
         }
       },
       "mock": {
-        "uuid": "a1b2c3d4e5f647a8b9c0d1e2f3a4b5c6"
+        "uuid": "a1b2c3d4e5f647a8b9c0d1e2f3a4b5c6",
+        "profile_uuid": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9"
       },
       "output": {
         "status_code": 201,
         "body": {
-          "name": "John Doe",
+          "first_name": "John",
+          "last_name": "Doe",
           "email": "john.doe@gmail.com",
           "phone_number": "1234567890"
         }

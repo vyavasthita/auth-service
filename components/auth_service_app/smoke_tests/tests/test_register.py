@@ -6,10 +6,11 @@ async def test_register_user(base_url, async_client):
     url = f"{base_url}/register"
 
     payload = {
-        "name": "Test User",
+        "first_name": "Test",
+        "last_name": "User",
         "email": "testuser@gmail.com",
         "password": "secret",
-        "phone_number": "9876543210"
+        "phone_number": "9876543210",
     }
 
     response = await async_client.post(url, json=payload)

@@ -14,7 +14,6 @@ from src.api.models import User
 from src.api.services import AuthService, AuthServiceImpl
 from src.utils import AuthServiceLogger
 
-
 logger = AuthServiceLogger.get_logger()
 
 
@@ -39,15 +38,17 @@ async def register(
     user: User = await auth_service.register(
         db_session=db_session,
         email=request.email,
-        name=request.name,
+        first_name=request.first_name,
+        last_name=request.last_name,
         password=request.password,
         phone_number=request.phone_number,
     )
     logger.info(f"User registered: {user.email}")
     return RegisterUserResponseDTO(
-        name=user.name,
         email=user.email,
-        phone_number=user.phone_number,
+        first_name=user.profile.first_name,
+        last_name=user.profile.last_name,
+        phone_number=user.profile.phone_number,
     )
 
 

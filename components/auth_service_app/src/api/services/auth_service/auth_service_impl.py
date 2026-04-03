@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies.config_dependency import Config
 from src.api.models import User
+from src.api.models.user_profile import UserProfile
 from src.api.repos import AuthRepository, IAuthRepository
 from src.utils import JWTUtils, Security
 from src.utils.email_validator import email_format_validator
@@ -28,20 +29,33 @@ class AuthServiceImpl(AuthService):
         self,
         db_session: AsyncSession,
         email: str,
-        name: str,
+        first_name: str,
+        last_name: str,
         password: str,
         phone_number: str,
     ) -> User:
-        """Register a new user in the system."""
+        """Register a new user and create their profile."""
+        user_id = uuid4().bytes
+
         user = User(
-            id=uuid4().bytes,
-            name=name,
+            id=user_id,
             email=email,
             password=Security.hash_password(password),
-            phone_number=phone_number,
         )
+        await self.auth_repository.save(db_session, user)
 
-        return await self.auth_repository.save(db_session, user)
+        profile = UserProfile(
+            id=uuid4().bytes,
+            first_name=first_name,
+            last_name=last_name,
+            phone_number=phone_number,
+            user_id=user_id,
+        )
+        db_session.add(profile)
+        await db_session.flush()
+
+        user.profile = profile
+        return user
 
     @email_format_validator
     @AuthService.is_valid_user

@@ -1,3 +1,5 @@
 databaseChangeLog:
     - includeAll:
           path: changelog/tables/user
+    - includeAll:
+          path: changelog/tables/user_profile
