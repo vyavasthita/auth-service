@@ -9,7 +9,9 @@ from src.api.repos.base import IRepository
 class ISessionRepository(IRepository[UserSession, bytes]):
     """Abstract interface for session-specific repository operations."""
 
-    async def save(self, session: AsyncSession, token: str, status: SessionStatus, user_id: bytes) -> UserSession:
+    async def save(
+        self, session: AsyncSession, token: str, jti: str, status: SessionStatus, user_id: bytes
+    ) -> UserSession:
         raise NotImplementedError("Subclasses must implement 'save'.")
 
     @abstractmethod

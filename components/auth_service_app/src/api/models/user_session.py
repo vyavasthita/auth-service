@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Enum, ForeignKey, LargeBinary, Text, func
+from sqlalchemy import Enum, ForeignKey, LargeBinary, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.api.models.base import Base
@@ -19,6 +19,7 @@ class UserSession(Base):
 
     user_session_id: Mapped[bytes] = mapped_column(LargeBinary(16), primary_key=True)
     token: Mapped[str] = mapped_column(Text, nullable=False)
+    jti: Mapped[str] = mapped_column(String(36), nullable=False, unique=True)
     status: Mapped[SessionStatus] = mapped_column(
         Enum(SessionStatus, native_enum=True), nullable=False, default=SessionStatus.ACTIVE
     )

@@ -14,10 +14,13 @@ class SessionRepository(BaseRepository[UserSession, bytes], ISessionRepository):
     def __init__(self):
         super().__init__(UserSession)
 
-    async def save(self, session: AsyncSession, token: str, status: SessionStatus, user_id: bytes) -> UserSession:
+    async def save(
+        self, session: AsyncSession, token: str, jti: str, status: SessionStatus, user_id: bytes
+    ) -> UserSession:
         user_session = UserSession(
             user_session_id=uuid4().bytes,
             token=token,
+            jti=jti,
             status=status,
             user_id=user_id,
         )

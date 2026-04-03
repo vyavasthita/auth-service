@@ -1,13 +1,11 @@
-from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.dependencies.config_dependency import Config
 from src.api.models import SessionStatus, User
 from src.api.repos import AuthRepository, IAuthRepository, ISessionRepository, SessionRepository
-from src.utils import JWTUtils, Security
+from src.utils import JWTUtils, Security, TokenClaims
 
 from .auth_decorators import is_new_user, is_valid_token, is_valid_user
 from .auth_service import AuthService
@@ -61,11 +59,10 @@ class AuthServiceImpl(AuthService):
     ) -> str:
         """Authenticate a user and return a JWT token."""
         user: User = kwargs["user"]
-        expire = datetime.now(UTC) + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
-        claims = {"sub": username, "exp": expire}
-        token = JWTUtils.generate_auth_token(claims=claims)
+        claims = TokenClaims.for_user(user)
+        token = JWTUtils.generate_auth_token(claims=claims.to_payload())
 
-        await self.session_repository.save(db_session, token, SessionStatus.ACTIVE, user.user_id)
+        await self.session_repository.save(db_session, token, claims.jti, SessionStatus.ACTIVE, user.user_id)
 
         return token
 

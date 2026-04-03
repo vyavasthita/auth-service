@@ -21,6 +21,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: jti
+                  type: varchar(36)
+                  remarks: Unique JWT token ID for revocation
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: status
                   type: ENUM('ACTIVE', 'INACTIVE', 'EXPIRED', 'REVOKED')
                   remarks: Status of the session
