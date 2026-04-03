@@ -14,7 +14,7 @@ class AuthServiceLogger:
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
-                    logger = logging.getLogger(Config().OTEL_SERVICE_NAME)
+                    logger = logging.getLogger(Config().SERVICE_NAME)
                     logger.setLevel(Config().LOG_LEVEL)
                     logger.propagate = True
                     if not logger.handlers and logger.name != "root":

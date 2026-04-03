@@ -20,7 +20,9 @@ health_router = APIRouter(
 @rate_limited_log(interval_seconds=Config().RATE_LIMITED_LOG_INTERVAL_SECONDS)
 async def health_check() -> str:
     """Database connectivity check."""
-    message = f"{Config().OTEL_SERVICE_NAME} is healthy."
+    message = f"{Config().SERVICE_NAME} is healthy."
+
     if health_check._can_log:
         logger.info(message)
+        
     return message

@@ -34,6 +34,6 @@ class InstrumentationSetup:
             app,
             metrics_config=InstrumentationSetup._get_metrics_config(),
             sanitization_config=InstrumentationSetup._get_sanitization_config(),
-            service_name=Config().OTEL_SERVICE_NAME,
+            service_name=Config().SERVICE_NAME,
             log_level=Config().LOG_LEVEL,
         )

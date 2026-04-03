@@ -14,7 +14,9 @@ from src.api.models import User
 from src.api.services import AuthService, AuthServiceImpl
 from src.utils import AuthServiceLogger
 
+
 logger = AuthServiceLogger.get_logger()
+
 
 auth_router = APIRouter(
     prefix="",
