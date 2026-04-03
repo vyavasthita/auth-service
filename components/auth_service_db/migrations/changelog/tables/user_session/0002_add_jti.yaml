@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0002-add-jti-to-users-sessions"
+      author: dilipsharma
+      changes:
+        - addColumn:
+            tableName: users_sessions
+            columns:
+              - column:
+                  name: jti
+                  type: varchar(36)
+                  remarks: Unique JWT token ID for revocation
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_users_sessions_jti
