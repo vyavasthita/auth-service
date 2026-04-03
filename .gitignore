@@ -128,7 +128,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env is tracked — it contains no secrets (passwords come from shell env vars)
+!.env
 .venv
 env/
 venv/

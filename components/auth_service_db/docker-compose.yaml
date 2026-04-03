@@ -44,6 +44,22 @@ services:
       - auth-service-api-network
       - observability
 
+  auth-service-phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: auth-service-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: auth-service-database
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${PHPMYADMIN_HOST_PORT}:80"
+    depends_on:
+      auth-service-database:
+        condition: service_healthy
+    networks:
+      - auth-service-api-network
+
 volumes:
   auth-service-database_data:
     driver: local
