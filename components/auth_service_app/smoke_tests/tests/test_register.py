@@ -10,7 +10,7 @@ async def test_register_user(base_url, async_client):
         "last_name": "User",
         "email": "testuser@gmail.com",
         "password": "secret",
-        "phone_number": "9876543210",
+        "phone_number": "5555555555",
     }
 
     response = await async_client.post(url, json=payload)

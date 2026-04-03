@@ -5,6 +5,7 @@ from .token_exception import InvalidTokenException
 from .user_exception import (
     EmailFormatException,
     InvalidCredentialsException,
+    PhoneNumberAlreadyExistsException,
     UserAlreadyExistsException,
     UserNotFoundException,
 )

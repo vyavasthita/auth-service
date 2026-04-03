@@ -10,7 +10,8 @@ async def test_login_user(base_url, async_client):
     password = "secret"
 
     register_payload = {
-        "name": "Smoke Test User",
+        "first_name": "Smoke",
+        "last_name": "Test User",
         "email": shared_email,
         "password": password,
         "phone_number": "9876543210",

@@ -2,9 +2,11 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from fastapi import Depends
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies.config_dependency import Config
+from src.api.exceptions.user_exception import PhoneNumberAlreadyExistsException
 from src.api.models import User
 from src.api.models.user_profile import UserProfile
 from src.api.repos import AuthRepository, IAuthRepository
@@ -45,14 +47,19 @@ class AuthServiceImpl(AuthService):
         await self.auth_repository.save(db_session, user)
 
         profile = UserProfile(
-            id=uuid4().bytes,
+            user_profile_id=uuid4().bytes,
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
             user_id=user_id,
         )
         db_session.add(profile)
-        await db_session.flush()
+
+        try:
+            await db_session.flush()
+        except IntegrityError as e:
+            await db_session.rollback()
+            raise PhoneNumberAlreadyExistsException(phone_number) from e
 
         user.profile = profile
         return user

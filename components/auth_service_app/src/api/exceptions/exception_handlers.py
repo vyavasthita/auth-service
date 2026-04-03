@@ -7,6 +7,7 @@ from src.api.exceptions.token_exception import InvalidTokenException
 from src.api.exceptions.user_exception import (
     EmailFormatException,
     InvalidCredentialsException,
+    PhoneNumberAlreadyExistsException,
     UserAlreadyExistsException,
     UserNotFoundException,
 )
@@ -49,6 +50,16 @@ def register_exception_handlers(app: FastAPI):
     async def email_format_exception_handler(
         request: Request,
         exc: EmailFormatException,
+    ):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"message": exc.message},
+        )
+
+    @app.exception_handler(PhoneNumberAlreadyExistsException)
+    async def phone_number_already_exists_exception_handler(
+        request: Request,
+        exc: PhoneNumberAlreadyExistsException,
     ):
         return JSONResponse(
             status_code=exc.status_code,

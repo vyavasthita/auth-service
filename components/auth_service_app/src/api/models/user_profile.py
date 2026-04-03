@@ -7,9 +7,9 @@ from src.api.models.base import Base
 
 
 class UserProfile(Base):
-    __tablename__ = "user_profiles"
+    __tablename__ = "users_profiles"
 
-    id: Mapped[bytes] = mapped_column(LargeBinary(16), primary_key=True)
+    user_profile_id: Mapped[bytes] = mapped_column(LargeBinary(16), primary_key=True)
     first_name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
