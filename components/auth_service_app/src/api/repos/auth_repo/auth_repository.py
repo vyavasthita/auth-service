@@ -22,11 +22,3 @@ class AuthRepository(BaseRepository[User, bytes], IAuthRepository):
             return result.scalar_one_or_none()
         except Exception as error:
             self._handle_db_error("find_by_email", error)
-
-    async def find_by_email(self, session: AsyncSession, email: str) -> User | None:
-        try:
-            statement = select(User).where(User.email == email).limit(1)
-            result = await session.execute(statement)
-            return result.scalar_one_or_none()
-        except Exception as error:
-            self._handle_db_error("find_by_email", error)

@@ -24,7 +24,10 @@ async def test_login_success_returns_token():
     mock_repo = MagicMock()
     mock_repo.find_by_email = AsyncMock(return_value=user)
 
-    service = AuthServiceImpl(auth_repository=mock_repo)
+    mock_session_repo = MagicMock()
+    mock_session_repo.save = AsyncMock()
+
+    service = AuthServiceImpl(auth_repository=mock_repo, session_repository=mock_session_repo)
 
     token = await service.login(
         MagicMock(spec=AsyncSession),
@@ -35,6 +38,7 @@ async def test_login_success_returns_token():
     assert isinstance(token, str)
     assert token
     mock_repo.find_by_email.assert_awaited_once()
+    mock_session_repo.save.assert_awaited_once()
 
 
 @pytest.mark.asyncio
@@ -47,7 +51,7 @@ async def test_login_invalid_password_raises():
     mock_repo = MagicMock()
     mock_repo.find_by_email = AsyncMock(return_value=user)
 
-    service = AuthServiceImpl(auth_repository=mock_repo)
+    service = AuthServiceImpl(auth_repository=mock_repo, session_repository=MagicMock())
 
     with pytest.raises(InvalidCredentialsException):
         await service.login(
@@ -62,7 +66,7 @@ async def test_login_user_not_found_raises():
     mock_repo = MagicMock()
     mock_repo.find_by_email = AsyncMock(return_value=None)
 
-    service = AuthServiceImpl(auth_repository=mock_repo)
+    service = AuthServiceImpl(auth_repository=mock_repo, session_repository=MagicMock())
 
     with pytest.raises(UserNotFoundException):
         await service.login(

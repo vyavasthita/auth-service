@@ -32,7 +32,7 @@ def is_valid_user(func):
     """Decorator to ensure the user exists and password is valid before login."""
 
     @wraps(func)
-    async def wrapper(self, db_session: AsyncSession, email: str, password: str):
+    async def wrapper(self, db_session: AsyncSession, email: str, password: str, **kwargs):
         user = await self._check_user(db_session, email)
 
         if user is None:
@@ -41,7 +41,9 @@ def is_valid_user(func):
         if not Security.verify_password(password, user.password):
             raise InvalidCredentialsException()
 
-        return await func(self, db_session, email, password)
+        kwargs["user"] = user
+
+        return await func(self, db_session, email, password, **kwargs)
 
     return wrapper
 

@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies.config_dependency import Config
 from src.api.exceptions.user_exception import PhoneNumberAlreadyExistsException
-from src.api.models import User
+from src.api.models import SessionStatus, User
 from src.api.models.user_profile import UserProfile
-from src.api.repos import AuthRepository, IAuthRepository
+from src.api.repos import AuthRepository, IAuthRepository, ISessionRepository, SessionRepository
 from src.utils import JWTUtils, Security
 from src.utils.email_validator import email_format_validator
 
@@ -23,8 +23,18 @@ class AuthServiceImpl(AuthService):
     def __init__(
         self,
         auth_repository: IAuthRepository = Depends(AuthRepository),
+        session_repository: ISessionRepository = Depends(SessionRepository),
     ):
         super().__init__(auth_repository)
+        self._session_repository = session_repository
+
+    @property
+    def session_repository(self) -> ISessionRepository:
+        return self._session_repository
+
+    @session_repository.setter
+    def session_repository(self, session_repository: ISessionRepository) -> None:
+        self._session_repository = session_repository
 
     @email_format_validator
     @is_new_user
@@ -72,11 +82,17 @@ class AuthServiceImpl(AuthService):
         db_session: AsyncSession,
         email: str,
         password: str,
+        **kwargs,
     ) -> str:
         """Authenticate a user and return a JWT token."""
+        user: User = kwargs["user"]
         expire = datetime.now(UTC) + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
         claims = {"sub": email, "exp": expire}
         token = JWTUtils.generate_auth_token(claims=claims)
+
+        await self.session_repository.save(db_session, token, SessionStatus.ACTIVE, user.user_id)
+
+        return token
 
     @is_valid_token
     async def validate_token(

@@ -51,6 +51,10 @@ async def test_post_login_valid_request(async_client: httpx.AsyncClient, test_ca
             "src.api.services.auth_service.auth_service_impl.JWTUtils.generate_auth_token",
             return_value=test_case.mock.token,
         ),
+        patch(
+            "src.api.repos.session_repo.session_repository.SessionRepository.save",
+            new_callable=AsyncMock,
+        ),
     ):
         response = await async_client.post(
             BASE_API_URL,

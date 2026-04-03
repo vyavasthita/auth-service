@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Cookie, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -72,6 +74,7 @@ async def login(
         email=request.email,
         password=request.password,
     )
+    
     response.set_cookie(
         key=config.COOKIE_NAME,
         value=token,
@@ -98,7 +101,11 @@ async def validate_token(
     if not access_token:
         raise InvalidTokenException()
     user: User = await auth_service.validate_token(db_session=db_session, token=access_token)
-    return ValidateTokenResponseDTO(user_id=user.user_id, email=user.email, message="Token is valid.")
+    return ValidateTokenResponseDTO(
+        user_id=str(UUID(bytes=user.user_id)),
+        email=user.email,
+        message="Token is valid.",
+    )
 
 
 @auth_router.post(

@@ -11,7 +11,7 @@
         }
       },
       "mock": {
-        "user_id": "test-user-id",
+        "user_id": "12345678-1234-5678-1234-567812345678",
         "email": "dilip@gmail.com",
         "claims": {
           "sub": "dilip@gmail.com",
@@ -21,7 +21,7 @@
       "output": {
         "status_code": 200,
         "body": {
-          "user_id": "test-user-id",
+          "user_id": "12345678-1234-5678-1234-567812345678",
           "email": "dilip@gmail.com"
         }
       }

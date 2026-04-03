@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock, MagicMock
+from uuid import UUID
 
 import pytest
 from fastapi import FastAPI
@@ -18,8 +19,9 @@ def client():
 
 
 def test_validate_token_valid(client, monkeypatch):
+    test_uuid = UUID("12345678-1234-5678-1234-567812345678")
     mock_user = MagicMock()
-    mock_user.user_id = "test-user-id"
+    mock_user.user_id = test_uuid.bytes
     mock_user.email = "user@gmail.com"
 
     monkeypatch.setattr(
@@ -30,7 +32,7 @@ def test_validate_token_valid(client, monkeypatch):
     response = client.post("/validate", cookies={"access_token": "validtoken"})
     assert response.status_code == 200
     data = response.json()
-    assert data["user_id"] == "test-user-id"
+    assert data["user_id"] == str(test_uuid)
     assert data["email"] == "user@gmail.com"
 
 
