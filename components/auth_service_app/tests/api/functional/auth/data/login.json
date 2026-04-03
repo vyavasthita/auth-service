@@ -56,11 +56,13 @@
       "mock": {
         "token": "mocked.jwt.token",
         "user_username": "dilip_sharma",
-        "user_password_hash": "$2b$12$mockedhashvalue"
+        "user_password_hash": "$2b$12$mockedhashvalue",
+        "user_id": "550e8400-e29b-41d4-a716-446655440000"
       },
       "output": {
         "status_code": 200,
         "body": {
+          "user_id": "550e8400-e29b-41d4-a716-446655440000",
           "message": "Login successful."
         },
         "cookie": "access_token"

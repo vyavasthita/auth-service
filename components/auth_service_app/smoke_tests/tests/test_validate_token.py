@@ -1,5 +1,4 @@
 import pytest
-from conftest import decode_jwt_payload
 
 
 @pytest.mark.asyncio
@@ -30,8 +29,7 @@ async def test_validate_token_smoke(base_url, async_client):
     )
 
     token = login_response.cookies["access_token"]
-    claims = decode_jwt_payload(token)
-    user_id = claims["sub"]
+    user_id = login_response.json()["user_id"]
 
     validate_response = await async_client.post(
         validate_url,

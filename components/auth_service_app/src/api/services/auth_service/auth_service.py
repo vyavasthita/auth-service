@@ -40,7 +40,7 @@ class AuthService(ABC):
         db_session: AsyncSession,
         username: str,
         password: str,
-    ) -> str:
+    ) -> tuple[str, bytes]:
         raise NotImplementedError("Method 'login' needs implementation.")
 
     @abstractmethod

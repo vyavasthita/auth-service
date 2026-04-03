@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock, MagicMock
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +18,7 @@ async def test_auth_service_impl_import():
 @pytest.mark.asyncio
 async def test_login_success_returns_token():
     user = User()
+    user.user_id = uuid4().bytes
     user.username = "testuser"
     # Use a valid bcrypt hash for the password
     user.password = Security.hash_password("secret")
@@ -29,7 +31,7 @@ async def test_login_success_returns_token():
 
     service = AuthServiceImpl(auth_repository=mock_repo, session_repository=mock_session_repo)
 
-    token = await service.login(
+    token, user_id = await service.login(
         MagicMock(spec=AsyncSession),
         username="testuser",
         password="secret",
@@ -37,6 +39,7 @@ async def test_login_success_returns_token():
 
     assert isinstance(token, str)
     assert token
+    assert isinstance(user_id, bytes)
     mock_repo.find_by_username.assert_awaited_once()
     mock_session_repo.save.assert_awaited_once()
 

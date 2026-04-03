@@ -6,6 +6,7 @@ Each test case is parameterized via @pytest.mark.test_section.
 """
 
 from unittest.mock import AsyncMock, MagicMock, patch
+from uuid import UUID
 
 import httpx
 import pytest
@@ -36,6 +37,7 @@ async def test_post_login_valid_request(async_client: httpx.AsyncClient, test_ca
     mock_user = MagicMock(spec=User)
     mock_user.username = test_case.mock.user_username
     mock_user.password = test_case.mock.user_password_hash
+    mock_user.user_id = UUID(test_case.mock.user_id).bytes
 
     with (
         patch(

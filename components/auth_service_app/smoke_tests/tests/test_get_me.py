@@ -1,5 +1,4 @@
 import pytest
-from conftest import decode_jwt_payload
 
 
 @pytest.mark.asyncio
@@ -28,8 +27,7 @@ async def test_get_me_smoke(base_url, async_client):
     )
 
     token = login_response.cookies["access_token"]
-    claims = decode_jwt_payload(token)
-    user_id = claims["sub"]
+    user_id = login_response.json()["user_id"]
 
     me_response = await async_client.get(
         me_url,
@@ -50,7 +48,10 @@ async def test_get_me_smoke(base_url, async_client):
 async def test_get_me_no_token_smoke(base_url, async_client):
     me_url = f"{base_url}/users/me"
 
-    response = await async_client.get(me_url)
+    response = await async_client.get(
+        me_url,
+        params={"user_id": "00000000-0000-0000-0000-000000000000"},
+    )
     assert response.status_code == 401, (
         f"Expected 401 without token, got: {response.status_code}"
     )

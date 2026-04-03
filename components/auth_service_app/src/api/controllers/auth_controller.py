@@ -64,7 +64,7 @@ async def login(
     """Authenticate a user and set an access token cookie."""
     logger.info(f"Login endpoint called for username: {request.username}")
 
-    token: str = await auth_service.login(
+    token, user_id = await auth_service.login(
         db_session=db_session,
         username=request.username,
         password=request.password,
@@ -80,7 +80,7 @@ async def login(
         max_age=config.TOKEN_EXPIRE_MINUTES * 60,
     )
     logger.info(f"User logged in: {request.username}")
-    return LoginUserResponseDTO()
+    return LoginUserResponseDTO(user_id=str(UUID(bytes=user_id)))
 
 
 @auth_router.post(

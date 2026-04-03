@@ -1,5 +1,4 @@
 import pytest
-from conftest import decode_jwt_payload
 
 
 @pytest.mark.asyncio
@@ -28,8 +27,7 @@ async def test_logout_smoke(base_url, async_client):
     )
 
     token = login_response.cookies["access_token"]
-    claims = decode_jwt_payload(token)
-    user_id = claims["sub"]
+    user_id = login_response.json()["user_id"]
 
     logout_response = await async_client.post(
         logout_url,

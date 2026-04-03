@@ -56,15 +56,15 @@ class AuthServiceImpl(AuthService):
         username: str,
         password: str,
         **kwargs,
-    ) -> str:
-        """Authenticate a user and return a JWT token."""
+    ) -> tuple[str, bytes]:
+        """Authenticate a user and return a JWT token and user_id."""
         user: User = kwargs["user"]
         claims = TokenClaims.for_user(user)
         token = JWTUtils.generate_auth_token(claims=claims.to_payload())
 
         await self.session_repository.save(db_session, token, claims.jti, SessionStatus.ACTIVE, user.user_id)
 
-        return token
+        return token, user.user_id
 
     @is_active_token
     @is_valid_token
