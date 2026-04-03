@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0001-role"
+      author: dilipsharma
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: role_id
+                  type: BINARY(16)
+                  autoIncrement: false
+                  remarks: The primary key of the table
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: role_name
+                  type: varchar(50)
+                  remarks: Name of the role
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_roles_role_name
+              - column:
+                  name: created_at
+                  type: datetime
+                  remarks: Timestamp when the role was created
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified_at
+                  type: datetime
+                  remarks: Timestamp when the role was last modified
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+          remarks: Roles lookup table
+          ifNotExists: true

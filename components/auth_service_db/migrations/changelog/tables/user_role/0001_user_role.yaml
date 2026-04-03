@@ -1,0 +1,37 @@
+databaseChangeLog:
+  - changeSet:
+      id: "0001-user-role"
+      author: dilipsharma
+      changes:
+        - createTable:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: BINARY(16)
+                  remarks: Foreign key to users table
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users_roles
+                    foreignKeyName: fk_users_roles_user_id
+                    references: users(user_id)
+              - column:
+                  name: role_id
+                  type: BINARY(16)
+                  remarks: Foreign key to roles table
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users_roles
+                    foreignKeyName: fk_users_roles_role_id
+                    references: roles(role_id)
+              - column:
+                  name: created_at
+                  type: datetime
+                  remarks: Timestamp when the role was assigned
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+          remarks: Junction table for users and roles (many-to-many)
+          ifNotExists: true

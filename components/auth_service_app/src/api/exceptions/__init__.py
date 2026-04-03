@@ -9,3 +9,4 @@ from .user_exception import (
     UserAlreadyExistsException,
     UserNotFoundException,
 )
+from .role_exception import RoleAlreadyExistsException, RoleNotFoundException

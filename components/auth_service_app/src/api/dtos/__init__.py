@@ -7,3 +7,4 @@ from .register_dto import (
     RegisterUserResponseDTO,
 )
 from .validate_token_dto import ValidateTokenRequestDTO, ValidateTokenResponseDTO
+from .role_dto import AddRoleRequestDTO, AddRoleResponseDTO
