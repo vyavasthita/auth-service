@@ -1,0 +1,60 @@
+{
+  "invalid_request_validation": [
+    {
+      "description": "Missing all required fields",
+      "input": {
+        "headers": { "Content-Type": "application/json" },
+        "body": {}
+      },
+      "output": {
+        "status_code": 422
+      }
+    },
+    {
+      "description": "Missing role_name field",
+      "input": {
+        "headers": { "Content-Type": "application/json" },
+        "body": { "name": "admin" }
+      },
+      "output": {
+        "status_code": 422
+      }
+    }
+  ],
+  "valid_request_validation": [
+    {
+      "description": "Add role with valid data",
+      "input": {
+        "headers": { "Content-Type": "application/json" },
+        "body": { "role_name": "admin" }
+      },
+      "mock": {
+        "role_name": "admin"
+      },
+      "output": {
+        "status_code": 201,
+        "body": {
+          "message": "Role 'admin' added successfully."
+        }
+      }
+    }
+  ],
+  "role_already_exists_validation": [
+    {
+      "description": "Add role that already exists",
+      "input": {
+        "headers": { "Content-Type": "application/json" },
+        "body": { "role_name": "admin" }
+      },
+      "mock": {
+        "role_name": "admin"
+      },
+      "output": {
+        "status_code": 409,
+        "body": {
+          "message": "Role with 'admin' already exists."
+        }
+      }
+    }
+  ]
+}
