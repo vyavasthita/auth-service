@@ -7,7 +7,7 @@ from src.api.models import SessionStatus, User
 from src.api.repos import AuthRepository, IAuthRepository, ISessionRepository, SessionRepository
 from src.utils import JWTUtils, Security, TokenClaims
 
-from .auth_decorators import is_new_user, is_valid_token, is_valid_user
+from .auth_decorators import is_active_token, is_new_user, is_valid_token, is_valid_user
 from .auth_service import AuthService
 
 
@@ -66,15 +66,16 @@ class AuthServiceImpl(AuthService):
 
         return token
 
+    @is_active_token
     @is_valid_token
     async def validate_token(
         self,
         db_session: AsyncSession,
         token: str,
+        user_id: bytes,
         **kwargs,
     ) -> User:
         """Validate a JWT token and return the user if valid."""
-        self.logger.debug(f"validate_token called with token: {token}")
         user = kwargs.get("user")
         self.logger.debug(f"validate_token got user: {user}")
         return user

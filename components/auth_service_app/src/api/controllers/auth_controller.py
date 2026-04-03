@@ -87,6 +87,7 @@ async def login(
     response_model=ValidateTokenResponseDTO,
 )
 async def validate_token(
+    user_id: str,
     db_session: AsyncSession = Depends(DatabaseDependency.get_db_session),
     auth_service: AuthService = Depends(AuthServiceImpl),
     access_token: str | None = Cookie(default=None),
@@ -94,7 +95,13 @@ async def validate_token(
     """Validate a JWT token from the cookie and return claims if valid."""
     if not access_token:
         raise InvalidTokenException()
-    user: User = await auth_service.validate_token(db_session=db_session, token=access_token)
+
+    user: User = await auth_service.validate_token(
+        db_session=db_session,
+        token=access_token,
+        user_id=UUID(user_id).bytes,
+    )
+
     return ValidateTokenResponseDTO(
         user_id=str(UUID(bytes=user.user_id)),
         username=user.username,

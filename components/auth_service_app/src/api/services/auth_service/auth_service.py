@@ -48,5 +48,6 @@ class AuthService(ABC):
         self,
         db_session: AsyncSession,
         token: str,
+        user_id: bytes,
     ) -> User:
         raise NotImplementedError("Method 'validate_token' needs implementation.")

@@ -10,6 +10,7 @@ from src.api.exceptions import (
     UserAlreadyExistsException,
     UserNotFoundException,
 )
+from src.api.models import SessionStatus
 from src.utils import JWTUtils, Security
 
 
@@ -52,7 +53,7 @@ def is_valid_token(func):
     """Decorator to ensure the token is valid."""
 
     @wraps(func)
-    async def wrapper(self, db_session: AsyncSession, token: str, **kwargs):
+    async def wrapper(self, db_session: AsyncSession, token: str, user_id: bytes, **kwargs):
         self.logger.debug("Validating token.")
 
         try:
@@ -79,6 +80,22 @@ def is_valid_token(func):
 
         kwargs["user"] = user
 
-        return await func(self, db_session, token, **kwargs)
+        return await func(self, db_session, token, user_id, **kwargs)
+
+    return wrapper
+
+
+def is_active_token(func):
+    """Decorator to ensure the token has an active session in the database."""
+
+    @wraps(func)
+    async def wrapper(self, db_session: AsyncSession, token: str, user_id: bytes, **kwargs):
+        session = await self.session_repository.find_by_user_and_token(db_session, user_id, token)
+
+        if session is None or session.status != SessionStatus.ACTIVE:
+            self.logger.debug("Token session is not active.")
+            raise InvalidTokenException()
+
+        return await func(self, db_session, token, user_id, **kwargs)
 
     return wrapper
