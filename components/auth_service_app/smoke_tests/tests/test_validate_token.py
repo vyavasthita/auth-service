@@ -7,17 +7,12 @@ async def test_validate_token_smoke(base_url, async_client):
     login_url = f"{base_url}/login"
     validate_url = f"{base_url}/validate"
 
-    shared_email = "smoke-validate-user@gmail.com"
     shared_username = "smoke_validate_user"
     password = "smokepass123"
 
     register_payload = {
         "username": shared_username,
-        "first_name": "Smoke",
-        "last_name": "Validate User",
-        "email": shared_email,
         "password": password,
-        "phone_number": "1234567890",
     }
 
     register_response = await async_client.post(register_url, json=register_payload)

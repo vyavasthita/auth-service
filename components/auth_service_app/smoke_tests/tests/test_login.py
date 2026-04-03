@@ -6,17 +6,12 @@ async def test_login_user(base_url, async_client):
     register_url = f"{base_url}/register"
     login_url = f"{base_url}/login"
 
-    shared_email = "smoke-user@gmail.com"
     shared_username = "smoke_user"
     password = "secret"
 
     register_payload = {
         "username": shared_username,
-        "first_name": "Smoke",
-        "last_name": "Test User",
-        "email": shared_email,
         "password": password,
-        "phone_number": "9876543210",
     }
 
     register_response = await async_client.post(register_url, json=register_payload)

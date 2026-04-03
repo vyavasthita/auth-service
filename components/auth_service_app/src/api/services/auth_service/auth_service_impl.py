@@ -2,16 +2,12 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from fastapi import Depends
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies.config_dependency import Config
-from src.api.exceptions.user_exception import PhoneNumberAlreadyExistsException
 from src.api.models import SessionStatus, User
-from src.api.models.user_profile import UserProfile
 from src.api.repos import AuthRepository, IAuthRepository, ISessionRepository, SessionRepository
 from src.utils import JWTUtils, Security
-from src.utils.email_validator import email_format_validator
 
 from .auth_decorators import is_new_user, is_valid_token, is_valid_user
 from .auth_service import AuthService
@@ -36,19 +32,14 @@ class AuthServiceImpl(AuthService):
     def session_repository(self, session_repository: ISessionRepository) -> None:
         self._session_repository = session_repository
 
-    @email_format_validator
     @is_new_user
     async def register(
         self,
         db_session: AsyncSession,
         username: str,
-        email: str,
-        first_name: str,
-        last_name: str,
         password: str,
-        phone_number: str,
     ) -> User:
-        """Register a new user and create their profile."""
+        """Register a new user."""
         user_id = uuid4().bytes
 
         user = User(
@@ -58,23 +49,6 @@ class AuthServiceImpl(AuthService):
         )
         await self.auth_repository.save(db_session, user)
 
-        profile = UserProfile(
-            user_profile_id=uuid4().bytes,
-            first_name=first_name,
-            last_name=last_name,
-            phone_number=phone_number,
-            email=email,
-            user_id=user_id,
-        )
-        db_session.add(profile)
-
-        try:
-            await db_session.flush()
-        except IntegrityError as e:
-            await db_session.rollback()
-            raise PhoneNumberAlreadyExistsException(phone_number) from e
-
-        user.profile = profile
         return user
 
     @is_valid_user

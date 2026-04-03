@@ -42,19 +42,11 @@ async def register(
     user: User = await auth_service.register(
         db_session=db_session,
         username=request.username,
-        email=request.email,
-        first_name=request.first_name,
-        last_name=request.last_name,
         password=request.password,
-        phone_number=request.phone_number,
     )
     logger.info(f"User registered: {user.username}")
     return RegisterUserResponseDTO(
         username=user.username,
-        email=user.profile.email,
-        first_name=user.profile.first_name,
-        last_name=user.profile.last_name,
-        phone_number=user.profile.phone_number,
     )
 
 

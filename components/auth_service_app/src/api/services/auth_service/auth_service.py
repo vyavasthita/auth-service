@@ -30,11 +30,7 @@ class AuthService(ABC):
         self,
         db_session: AsyncSession,
         username: str,
-        email: str,
-        first_name: str,
-        last_name: str,
         password: str,
-        phone_number: str,
     ) -> User:
         raise NotImplementedError("Method 'register' needs implementation.")
 

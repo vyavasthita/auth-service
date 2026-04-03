@@ -17,6 +17,7 @@ services:
       OTEL_EXPORTER_TRACES_ENDPOINT: "http://otel-collector:4318/v1/traces"
       OTEL_EXPORTER_METRICS_ENDPOINT: "http://otel-collector:4318/v1/metrics"
       SERVICE_NAME: ${SERVICE_NAME}
+      SECRET_KEY: ${AUTH_SERVICE_SECRET_KEY}
       API_PORT: ${API_PORT}
       METRICS_MOUNT_PATH: "/metrics"
       ATTACH_PYTHON_LOGGING: "true"
