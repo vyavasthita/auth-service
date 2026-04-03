@@ -1,14 +1,13 @@
 import pytest
 from fastapi.testclient import TestClient
-from src.api.controllers import AuthController
+from src.api.controllers import auth_router
 from fastapi import FastAPI
 from src.api.dtos import ValidateTokenRequestDTO
 
 @pytest.fixture
 def client():
     app = FastAPI()
-    controller = AuthController()
-    app.include_router(controller.router)
+    app.include_router(auth_router)
     return TestClient(app)
 
 

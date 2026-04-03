@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.api.controllers import HealthController, AuthController
+from src.api.controllers import health_router, auth_router
 
 
 class RouterRegistrar:
@@ -8,5 +8,5 @@ class RouterRegistrar:
     @staticmethod
     def register(app: FastAPI):
         """Registers routers with the FastAPI application."""
-        app.include_router(HealthController().router)
-        app.include_router(AuthController().router)
+        app.include_router(health_router)
+        app.include_router(auth_router)

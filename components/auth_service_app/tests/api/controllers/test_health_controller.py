@@ -1,7 +1,7 @@
 import pytest
-from src.api.controllers import HealthController
+from src.api.controllers import health_router
 
 
 @pytest.mark.asyncio
 async def test_health_controller_import():
-    assert HealthController() is not None
+    assert health_router is not None

@@ -1,2 +1,2 @@
-from .health_controller import HealthController
-from .auth_controller import AuthController
+from .health_controller import health_router
+from .auth_controller import auth_router
