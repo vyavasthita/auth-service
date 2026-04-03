@@ -2,6 +2,7 @@ from .login_dto import (
     LoginUserRequestDTO,
     LoginUserResponseDTO,
 )
+from .logout_dto import LogoutRequestDTO
 from .register_dto import (
     RegisterUserRequestDTO,
     RegisterUserResponseDTO,

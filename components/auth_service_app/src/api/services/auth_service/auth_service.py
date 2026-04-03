@@ -51,3 +51,12 @@ class AuthService(ABC):
         user_id: bytes,
     ) -> User:
         raise NotImplementedError("Method 'validate_token' needs implementation.")
+
+    @abstractmethod
+    async def logout(
+        self,
+        db_session: AsyncSession,
+        token: str,
+        user_id: bytes,
+    ) -> None:
+        raise NotImplementedError("Method 'logout' needs implementation.")

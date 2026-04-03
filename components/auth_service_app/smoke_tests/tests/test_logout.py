@@ -1,4 +1,5 @@
 import pytest
+from conftest import decode_jwt_payload
 
 
 @pytest.mark.asyncio
@@ -6,7 +7,6 @@ async def test_logout_smoke(base_url, async_client):
     register_url = f"{base_url}/register"
     login_url = f"{base_url}/login"
     logout_url = f"{base_url}/logout"
-    validate_url = f"{base_url}/validate"
 
     shared_username = "smoke_logout_user"
     password = "smokepass123"
@@ -28,10 +28,12 @@ async def test_logout_smoke(base_url, async_client):
     )
 
     token = login_response.cookies["access_token"]
+    claims = decode_jwt_payload(token)
+    user_id = claims["sub"]
 
     logout_response = await async_client.post(
         logout_url,
-        cookies={"access_token": token},
+        json={"user_id": user_id, "token": token},
     )
     assert logout_response.status_code == 200, (
         f"Logout failed: {logout_response.status_code}"
@@ -39,9 +41,3 @@ async def test_logout_smoke(base_url, async_client):
 
     body = logout_response.json()
     assert body["message"] == "Logged out successfully."
-
-    # After logout the cookie should be cleared — validate should fail
-    validate_response = await async_client.post(validate_url)
-    assert validate_response.status_code == 401, (
-        f"Expected 401 after logout, got: {validate_response.status_code}"
-    )

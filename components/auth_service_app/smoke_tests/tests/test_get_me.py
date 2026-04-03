@@ -1,4 +1,5 @@
 import pytest
+from conftest import decode_jwt_payload
 
 
 @pytest.mark.asyncio
@@ -27,10 +28,13 @@ async def test_get_me_smoke(base_url, async_client):
     )
 
     token = login_response.cookies["access_token"]
+    claims = decode_jwt_payload(token)
+    user_id = claims["sub"]
 
     me_response = await async_client.get(
         me_url,
         cookies={"access_token": token},
+        params={"user_id": user_id},
     )
     assert me_response.status_code == 200, (
         f"GET /users/me failed: {me_response.status_code}"

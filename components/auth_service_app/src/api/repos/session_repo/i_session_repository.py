@@ -17,3 +17,13 @@ class ISessionRepository(IRepository[UserSession, bytes]):
     @abstractmethod
     async def find_by_user_and_token(self, session: AsyncSession, user_id: bytes, token: str) -> UserSession | None:
         raise NotImplementedError("Subclasses must implement 'find_by_user_and_token'.")
+
+    @abstractmethod
+    async def update_status(
+        self,
+        session: AsyncSession,
+        user_id: bytes,
+        token: str,
+        status: SessionStatus,
+    ) -> None:
+        raise NotImplementedError("Subclasses must implement 'update_status'.")

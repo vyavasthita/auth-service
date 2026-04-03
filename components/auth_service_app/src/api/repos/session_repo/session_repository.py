@@ -35,3 +35,19 @@ class SessionRepository(BaseRepository[UserSession, bytes], ISessionRepository):
             return result.scalar_one_or_none()
         except Exception as error:
             self._handle_db_error("find_by_user_and_token", error)
+
+    async def update_status(
+        self,
+        session: AsyncSession,
+        user_id: bytes,
+        token: str,
+        status: SessionStatus,
+    ) -> None:
+        try:
+            user_session = await self.find_by_user_and_token(session, user_id, token)
+
+            if user_session is not None:
+                user_session.status = status
+                await session.flush()
+        except Exception as error:
+            self._handle_db_error("update_status", error)

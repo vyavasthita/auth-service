@@ -8,6 +8,7 @@ from src.api.dependencies.config_dependency import Config
 from src.api.dtos import (
     LoginUserRequestDTO,
     LoginUserResponseDTO,
+    LogoutRequestDTO,
     RegisterUserRequestDTO,
     RegisterUserResponseDTO,
     ValidateTokenResponseDTO,
@@ -113,8 +114,19 @@ async def validate_token(
     "/logout",
     status_code=status.HTTP_200_OK,
 )
-async def logout(response: Response) -> dict:
-    """Clear the access token cookie."""
+async def logout(
+    request: LogoutRequestDTO,
+    response: Response,
+    db_session: AsyncSession = Depends(DatabaseDependency.get_db_session),
+    auth_service: AuthService = Depends(AuthServiceImpl),
+) -> dict:
+    """Invalidate the session and clear the access token cookie."""
+    await auth_service.logout(
+        db_session=db_session,
+        token=request.token,
+        user_id=UUID(request.user_id).bytes,
+    )
+
     response.delete_cookie(
         key=config.COOKIE_NAME,
         httponly=config.COOKIE_HTTPONLY,

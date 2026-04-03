@@ -79,3 +79,12 @@ class AuthServiceImpl(AuthService):
         user = kwargs.get("user")
         self.logger.debug(f"validate_token got user: {user}")
         return user
+
+    async def logout(
+        self,
+        db_session: AsyncSession,
+        token: str,
+        user_id: bytes,
+    ) -> None:
+        """Invalidate a user session."""
+        await self.session_repository.update_status(db_session, user_id, token, SessionStatus.INACTIVE)
