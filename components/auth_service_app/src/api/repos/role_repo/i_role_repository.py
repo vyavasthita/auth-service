@@ -9,8 +9,7 @@ from src.api.repos.base import IRepository
 class IRoleRepository(IRepository[Role, bytes]):
     """Abstract interface for role-specific repository operations."""
 
-    async def save(
-        self, session: AsyncSession, role_name: str) -> Role:
+    async def save(self, session: AsyncSession, role_name: str) -> Role:
         raise NotImplementedError("Subclasses must implement 'save'.")
 
     @abstractmethod

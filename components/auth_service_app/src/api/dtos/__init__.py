@@ -6,5 +6,5 @@ from .register_dto import (
     RegisterUserRequestDTO,
     RegisterUserResponseDTO,
 )
-from .validate_token_dto import ValidateTokenRequestDTO, ValidateTokenResponseDTO
 from .role_dto import AddRoleRequestDTO, AddRoleResponseDTO
+from .validate_token_dto import ValidateTokenRequestDTO, ValidateTokenResponseDTO

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.api.controllers import health_router, auth_router, role_router
+from src.api.controllers import auth_router, health_router, role_router
 
 
 class RouterRegistrar:

@@ -1,8 +1,11 @@
+from uuid import uuid4
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import Role
 from src.api.repos.base import BaseRepository
+
 from .i_role_repository import IRoleRepository
 
 
@@ -13,7 +16,11 @@ class RoleRepository(BaseRepository[Role, bytes], IRoleRepository):
         super().__init__(Role)
 
     async def save(self, session: AsyncSession, role_name: str) -> Role:
-        return await self.create(session, Role(role_name=role_name))
+        role = Role(
+            role_id=uuid4().bytes,
+            role_name=role_name,
+        )
+        return await self.create(session, role)
 
     async def find_by_role_name(self, session: AsyncSession, role_name: str) -> Role | None:
         try:

@@ -3,8 +3,9 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from src.api.exceptions.token_exception import InvalidTokenException
-from src.api.exceptions.user_exception import (
+from .role_exception import RoleAlreadyExistsException
+from .token_exception import InvalidTokenException
+from .user_exception import (
     EmailFormatException,
     InvalidCredentialsException,
     PhoneNumberAlreadyExistsException,
@@ -88,4 +89,14 @@ def register_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=500,
             content={"message": "Internal server error."},
+        )
+
+    @app.exception_handler(RoleAlreadyExistsException)
+    async def role_already_exists_exception_handler(
+        request: Request,
+        exc: RoleAlreadyExistsException,
+    ):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"message": exc.message},
         )
