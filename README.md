@@ -29,8 +29,8 @@ README: |
   ## Quick Start
 
   ```bash
-  cd components
   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
+  make build   # first time or after dependency changes (e.g. instrumentation-hub update)
   make up
   ```
 

@@ -9,8 +9,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"  # Python runtime version
 pydantic-settings = "^2.7.1"  # Settings management using Pydantic
-# TEMP: Use development branch for instrumentation-hub-fastapi
-instrumentation-hub-fastapi = { git = "https://github.com/vyavasthita/instrumentation-hub.git", rev = "master", subdirectory = "packages/python/fastapi" }
+instrumentation-hub-fastapi = { git = "https://github.com/vyavasthita/instrumentation-hub.git", rev = "main", subdirectory = "packages/python/fastapi" }
 sqlalchemy = "^2.0.45"
 aiomysql = "^0.3.2"
 greenlet = "^3.0"

@@ -2,7 +2,8 @@ FROM python:3.13.1-alpine3.21 AS requirements-stage
 
 WORKDIR /tmp
 
-# Install Poetry
+# Install Poetry and git (git is required for VCS/git dependencies in pyproject.toml)
+RUN apk add --no-cache git
 RUN pip3 install poetry poetry-plugin-export
 
 # Copy poetry files

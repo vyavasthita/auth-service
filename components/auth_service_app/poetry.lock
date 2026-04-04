@@ -738,7 +738,7 @@ pydantic-settings = ">=2.12.0,<3.0.0"
 [package.source]
 type = "git"
 url = "https://github.com/vyavasthita/instrumentation-hub.git"
-reference = "master"
+reference = "main"
 resolved_reference = "492038f489445d9ea956959876b7e57e9caa7101"
 subdirectory = "packages/python/fastapi"
 
@@ -1659,4 +1659,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "b652be7dc47301ca3279294d0de27ea67e83f969c895ac71a83ec335f4feb1ff"
+content-hash = "9af0a2991dbfaf153f0bd3ff48485c61ddbfa9e7a19eec14ed46c80392441d8a"

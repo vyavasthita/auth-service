@@ -59,6 +59,7 @@ services:
         condition: service_healthy
     networks:
       - auth-service-api-network
+      - observability
 
 volumes:
   auth-service-database_data:
