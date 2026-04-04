@@ -8,3 +8,4 @@
 | 4 | Add user_controller to get user details | Not Started |
 | 5 | Implement logout | Not Started |
 | 6 | Add Grafana | Not Started |
+| 7 | Implement logout | Not Started |
