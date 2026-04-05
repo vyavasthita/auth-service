@@ -1,0 +1,45 @@
+// Auth Service Dev Container
+// Starts all services (MySQL, Liquibase, API, phpMyAdmin) using the existing compose files.
+// VS Code attaches to the auth-service container for development.
+{
+  "name": "Auth Service",
+  "dockerComposeFile": [
+    "../docker-compose.yaml",
+    "docker-compose.devcontainer.yaml"
+  ],
+  "service": "auth-service",
+  "workspaceFolder": "/app",
+
+  // Do NOT replace the container command with 'sleep infinity'.
+  // Let uvicorn start automatically via the compose override.
+  "overrideCommand": false,
+
+  // Creates the shared Docker network on the HOST before build.
+  // Safe to run even if OAAS already created it.
+  "initializeCommand": "docker network create oaas-observability-net 2>/dev/null || true",
+
+  // Install dev dependencies inside the container after creation.
+  "postCreateCommand": "pip install ruff pytest pytest-asyncio httpx",
+
+  "forwardPorts": [5002, 5001, 5003],
+  "portsAttributes": {
+    "5002": { "label": "Auth Service API", "onAutoForward": "notify" },
+    "5001": { "label": "MySQL", "onAutoForward": "silent" },
+    "5003": { "label": "phpMyAdmin", "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+
+  "shutdownAction": "stopCompose"
+}

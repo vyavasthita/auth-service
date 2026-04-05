@@ -17,12 +17,47 @@ flowchart LR
 
 ---
 
-## Prerequisites
+## Getting Started
 
-- Docker Desktop / Docker Engine + Compose
-- [OAAS](https://github.com/vyavasthita/oaas) running (`make up` in the oaas repo)
+### Option A — Dev Container (Recommended)
 
-### Configure `.env`
+**Prerequisites:** VS Code, Docker Desktop, [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+1. Clone this repo
+2. Configure [`.env`](.env) (see table below)
+3. Export secrets:
+   ```bash
+   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
+   export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
+   ```
+4. Open the folder in VS Code
+5. When prompted, click **Reopen in Container**
+6. All services (MySQL, Liquibase, API, phpMyAdmin) start automatically
+7. Start the API from the VS Code terminal:
+   ```bash
+   python -m uvicorn src.api:app --host 0.0.0.0 --port ${API_PORT} --reload
+   ```
+8. Swagger UI: **http://localhost:5002/auth-service/docs**
+
+> Ensure [OAAS](https://github.com/vyavasthita/oaas) is running first for observability.
+
+### Option B — Makefile
+
+**Prerequisites:** Docker Desktop / Docker Engine + Compose, Make
+
+1. Clone this repo
+2. Configure [`.env`](.env) (see table below)
+3. Run:
+   ```bash
+   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
+   export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
+   make build   # first time or after dependency changes
+   make up
+   ```
+
+Swagger UI: **http://localhost:5002/auth-service/docs**
+
+### `.env` Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -32,19 +67,6 @@ flowchart LR
 | `API_PORT` | `5002` | Auth Service API port |
 | `PHPMYADMIN_HOST_PORT` | `5003` | phpMyAdmin port |
 | `MYSQL_PORT` | `3306` | MySQL internal port (do not change) |
-
----
-
-## Quick Start
-
-```bash
-export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
-export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
-make build   # first time or after dependency changes
-make up
-```
-
-Swagger UI: **http://localhost:5002/auth-service/docs**
 
 ---
 

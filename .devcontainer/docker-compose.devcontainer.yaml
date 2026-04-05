@@ -1,0 +1,29 @@
+# Dev Container override for Auth Service
+# Runs uvicorn with --reload for hot reloading during development.
+# Dev-safe defaults are provided for secrets that are normally exported.
+
+services:
+  auth-service:
+    command: sh -c "python -m uvicorn src.api:app --host 0.0.0.0 --port ${API_PORT} --reload"
+    environment:
+      MYSQL_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD:-devpassword}
+      SECRET_KEY: ${AUTH_SERVICE_SECRET_KEY:-devsecretkey}
+
+  # Dev-safe secret defaults
+  auth-service-database:
+    environment:
+      MYSQL_ROOT_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD:-devpassword}
+
+  auth-service-liquibase:
+    environment:
+      MYSQL_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD:-devpassword}
+
+  auth-service-phpmyadmin:
+    environment:
+      PMA_PASSWORD: ${AUTH_SERVICE_MYSQL_ROOT_PASSWORD:-devpassword}
+
+  # Smoke tests depend on a healthy auth-service running the API.
+  # In dev mode, skip smoke tests to avoid blocking container startup.
+  smoke-tests:
+    profiles:
+      - donotstart
