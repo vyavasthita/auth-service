@@ -20,6 +20,11 @@ services:
       SERVICE_NAME: ${SERVICE_NAME}
       SECRET_KEY: ${AUTH_SERVICE_SECRET_KEY}
       API_PORT: ${API_PORT}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      JWKS_HOST: http://localhost:${API_PORT}/${SERVICE_NAME}
+      RSA_PRIVATE_KEY_FILE: /app/keys/private.pem
+      RSA_PUBLIC_KEY_FILE: /app/keys/public.pem
       METRICS_MOUNT_PATH: "/metrics"
       ATTACH_PYTHON_LOGGING: "true"
       LOG_LEVEL: "INFO"
@@ -38,6 +43,7 @@ services:
       interval: 20s
     volumes:
       - ./src:/app/src
+      - auth-service-keys:/app/keys
     networks:
       - auth-service-api-network
       - observability
@@ -55,4 +61,7 @@ services:
     networks:
       - auth-service-api-network
       - observability
+
+volumes:
+  auth-service-keys:
 

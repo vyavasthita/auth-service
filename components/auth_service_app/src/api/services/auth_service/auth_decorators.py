@@ -1,7 +1,6 @@
-import time
 from functools import wraps
 
-import jwt
+from jwt_lib.exceptions import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.exceptions import (
@@ -11,7 +10,7 @@ from src.api.exceptions import (
     UserNotFoundException,
 )
 from src.api.models import SessionStatus
-from src.utils import JWTUtils, Security
+from src.utils import Security
 
 
 def is_new_user(func):
@@ -50,28 +49,18 @@ def is_valid_user(func):
 
 
 def is_valid_token(func):
-    """Decorator to ensure the token is valid."""
+    """Decorator to ensure the token is valid using token-validator library."""
 
     @wraps(func)
     async def wrapper(self, db_session: AsyncSession, token: str, user_id: bytes, **kwargs):
-        self.logger.debug("Validating token.")
+        self.logger.debug("Validating token via UserAuthenticator.")
 
         try:
-            claims = JWTUtils.decode_auth_token(token)
-            self.logger.debug(f"validate_token claims: {claims}")
-        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
-            self.logger.debug("Token is invalid.")
+            claims = await self._authenticator.validate(token)
+            self.logger.debug(f"validate_token claims: {dict(claims)}")
+        except JWTError as e:
+            self.logger.debug(f"Token validation failed: {e}")
             raise InvalidTokenException() from e
-
-        exp = claims.get("exp")
-
-        if exp is not None:
-            now = int(time.time())
-            if isinstance(exp, float):
-                exp = int(exp)
-            if now > exp:
-                self.logger.debug("Token is expired.")
-                raise InvalidTokenException()
 
         user = await self._check_user(db_session, claims["sub"])
 

@@ -86,6 +86,7 @@ async def login(
 @auth_router.post(
     "/validate",
     response_model=ValidateTokenResponseDTO,
+    include_in_schema=False,
 )
 async def validate_token(
     user_id: str,

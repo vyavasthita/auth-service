@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.api.controllers import auth_router, health_router, role_router, user_router
+from src.api.controllers import auth_router, health_router, jwks_router, role_router, user_router
 
 
 class RouterRegistrar:
@@ -11,5 +11,6 @@ class RouterRegistrar:
         """Registers routers with the FastAPI application."""
         app.include_router(health_router)
         app.include_router(auth_router)
+        app.include_router(jwks_router)
         app.include_router(role_router)
         app.include_router(user_router)

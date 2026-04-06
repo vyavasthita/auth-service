@@ -1,8 +1,10 @@
 from uuid import uuid4
 
 from fastapi import Depends
+from jwt_lib.authenticator import UserAuthenticator
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.dependencies import get_authenticator
 from src.api.models import SessionStatus, User
 from src.api.repos import AuthRepository, IAuthRepository, ISessionRepository, SessionRepository
 from src.utils import JWTUtils, Security, TokenClaims
@@ -18,9 +20,11 @@ class AuthServiceImpl(AuthService):
         self,
         auth_repository: IAuthRepository = Depends(AuthRepository),
         session_repository: ISessionRepository = Depends(SessionRepository),
+        authenticator: UserAuthenticator = Depends(get_authenticator),
     ):
         super().__init__(auth_repository)
         self._session_repository = session_repository
+        self._authenticator = authenticator
 
     @property
     def session_repository(self) -> ISessionRepository:

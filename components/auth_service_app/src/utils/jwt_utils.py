@@ -2,16 +2,27 @@ from typing import Any
 
 import jwt
 
-from src.api.dependencies.config_dependency import Config
+from src.utils.key_manager import KeyManager
 
 
 class JWTUtils:
     @staticmethod
     def generate_auth_token(claims: dict[str, Any]) -> str:
-        """Generate a JWT token with the given payload."""
-        return jwt.encode(claims, Config().SECRET_KEY, algorithm=Config().ALGORITHM)
+        """Generate a JWT token signed with RS256."""
+        key_manager = KeyManager()
+        return jwt.encode(
+            claims,
+            key_manager.private_key,
+            algorithm="RS256",
+            headers={"kid": key_manager.kid, "typ": "JWT"},
+        )
 
     @staticmethod
     def decode_auth_token(token: str) -> dict[str, Any]:
-        """Decode a JWT token and return the claims if valid."""
-        return jwt.decode(token, Config().SECRET_KEY, algorithms=[Config().ALGORITHM])
+        """Decode a JWT token using the local RSA public key."""
+        key_manager = KeyManager()
+        return jwt.decode(
+            token,
+            key_manager.public_key,
+            algorithms=["RS256"],
+        )

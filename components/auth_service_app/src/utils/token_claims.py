@@ -13,7 +13,13 @@ class TokenClaims(BaseModel):
     sub: str = Field(description="Subject (username)")
     exp: float = Field(description="Expiration time (unix timestamp)")
     iat: float = Field(description="Issued at (unix timestamp)")
+    nbf: float = Field(description="Not before (unix timestamp)")
     jti: str = Field(description="Unique token ID for revocation")
+    iss: str = Field(description="Token issuer")
+    aud: str = Field(description="Token audience")
+    tokenType: str = Field(default="UserAuthToken", description="Token type")
+    principalType: str = Field(default="USER", description="Principal type")
+    connectionMethod: str = Field(default="UIDPWD", description="Connection method")
 
     @classmethod
     def for_user(cls, user: User) -> "TokenClaims":
@@ -25,7 +31,10 @@ class TokenClaims(BaseModel):
             sub=user.username,
             exp=expire.timestamp(),
             iat=now.timestamp(),
+            nbf=now.timestamp(),
             jti=str(uuid4()),
+            iss=Config().JWT_ISSUER,
+            aud=Config().JWT_AUDIENCE,
         )
 
     def to_payload(self) -> dict:
