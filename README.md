@@ -1,12 +1,15 @@
 # Auth Service
 
-- JWT-based authentication and RBAC service for microservices.
-- Uses [Token Validator](https://github.com/vyavasthita/token-validator) for RS256 JWT signing (JWKS) and token validation.
-- Uses [Instrumentation Hub](https://github.com/vyavasthita/instrumentation-hub) to push observability telemetry to [OAAS](https://github.com/vyavasthita/oaas).
+- A **production-ready JWT authentication and RBAC service**
+- Issues RS256 tokens, exposes JWKS for zero-trust verification, and ships with full observability out of the box.
 
----
+### Why Auth Service?
 
-## Architecture
+- **RS256 + JWKS.** Tokens are signed with RSA keys and verified via a standard `/.well-known/jwks.json` endpoint — downstream services validate tokens without sharing secrets.
+- **Pluggable token validation.** Uses [Token Validator](https://github.com/vyavasthita/token-validator) for async JWT verification with JWKS caching, claim validation, and strategy pattern — the same library any consumer can use.
+- **Built-in observability.** Uses [Instrumentation Hub](https://github.com/vyavasthita/instrumentation-hub) to push logs, traces, and metrics to [OAAS](https://github.com/vyavasthita/oaas) — no observability code in the business logic.
+- **Clean architecture.** FastAPI dependency injection, generic repository pattern, Liquibase migrations, and configuration via Pydantic settings. Business logic is fully testable in isolation.
+- **Dev-ready in one click.** VS Code Dev Container boots MySQL, Liquibase, API, and phpMyAdmin automatically — no local tooling required.
 
 ```mermaid
 flowchart LR
@@ -22,45 +25,8 @@ flowchart LR
 
 ## Getting Started
 
-### Option A — Dev Container (Recommended)
-
-**Prerequisites:** VS Code, Docker Desktop, [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-
-1. Clone this repo
-2. Configure [`.env`](.env) (see table below)
-3. Export secrets:
-   ```bash
-   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
-   export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
-   ```
-4. Open the folder in VS Code
-5. When prompted, click **Reopen in Container**
-6. All services (MySQL, Liquibase, API, phpMyAdmin) start automatically
-7. Start the API from the VS Code terminal:
-   ```bash
-   python -m uvicorn src.api:app --host 0.0.0.0 --port ${API_PORT} --reload
-   ```
-8. Swagger UI: **http://localhost:2002/auth-service/docs**
-
-> Ensure [OAAS](https://github.com/vyavasthita/oaas) is running first for observability.
-
-### Option B — Makefile
-
-**Prerequisites:** Docker Desktop / Docker Engine + Compose, Make
-
-1. Clone this repo
-2. Configure [`.env`](.env) (see table below)
-3. Run:
-   ```bash
-   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
-   export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
-   make build   # first time or after dependency changes
-   make up
-   ```
-
-Swagger UI: **http://localhost:2002/auth-service/docs**
-
 ### `.env` Configuration
+- Configure [`.env`](.env) 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -72,6 +38,38 @@ Swagger UI: **http://localhost:2002/auth-service/docs**
 | `MYSQL_PORT` | `3306` | MySQL internal port (do not change) |
 
 ---
+
+### Option A — Dev Container (Recommended)
+
+**Prerequisites:** VS Code, Docker Desktop, [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+1. Clone this repo
+2. Export secrets:
+   ```bash
+   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
+   export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
+   ```
+3. Open the folder in VS Code
+4. When prompted, click **Reopen in Container**
+5. All services (MySQL, Liquibase, API, phpMyAdmin) start automatically
+6. Swagger UI: **http://localhost:<API_PORT>/auth-service/docs**
+
+> Ensure [OAAS](https://github.com/vyavasthita/oaas) is running first for observability.
+
+### Option B — Makefile
+
+**Prerequisites:** Docker Desktop / Docker Engine + Compose, Make
+
+1. Clone this repo
+2. Run:
+   ```bash
+   export AUTH_SERVICE_MYSQL_ROOT_PASSWORD=yourpassword
+   export AUTH_SERVICE_SECRET_KEY=yourjwtsecret
+   make build   # first time or after dependency changes
+   make up
+   ```
+
+Swagger UI: **http://localhost:<API_PORT>/auth-service/docs**
 
 ## Make Commands
 
@@ -92,9 +90,9 @@ Swagger UI: **http://localhost:2002/auth-service/docs**
 
 | Service | URL | Variable |
 |---------|-----|----------|
-| Auth API | http://localhost:2002/auth-service/docs | `API_PORT` |
+| Auth API | http://localhost:<API_PORT>/auth-service/docs | `API_PORT` |
 | MySQL | localhost:2001 | `MYSQL_HOST_PORT` |
-| phpMyAdmin | http://localhost:2003 | `PHPMYADMIN_HOST_PORT` |
+| phpMyAdmin | http://localhost:<PHPMYADMIN_HOST_PORT> | `PHPMYADMIN_HOST_PORT` |
 
 ---
 
