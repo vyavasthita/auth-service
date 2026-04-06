@@ -17,9 +17,9 @@ class TokenClaims(BaseModel):
     jti: str = Field(description="Unique token ID for revocation")
     iss: str = Field(description="Token issuer")
     aud: str = Field(description="Token audience")
-    tokenType: str = Field(default="UserAuthToken", description="Token type")
-    principalType: str = Field(default="USER", description="Principal type")
-    connectionMethod: str = Field(default="UIDPWD", description="Connection method")
+    tokenType: str = Field(default="UserAuthToken", description="Token type")  # noqa: N815
+    principalType: str = Field(default="USER", description="Principal type")  # noqa: N815
+    connectionMethod: str = Field(default="UIDPWD", description="Connection method")  # noqa: N815
 
     @classmethod
     def for_user(cls, user: User) -> "TokenClaims":

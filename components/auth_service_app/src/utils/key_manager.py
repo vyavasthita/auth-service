@@ -4,13 +4,11 @@ import os
 from base64 import urlsafe_b64encode
 from pathlib import Path
 
-from jwt.algorithms import RSAAlgorithm
-
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from jwt.algorithms import RSAAlgorithm
 
 from src.api.dependencies import Config
-
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +99,6 @@ class KeyManager:
 
     def get_jwks(self) -> dict:
         """Return the public key in JWKS format."""
-        
 
         jwk_dict = RSAAlgorithm.to_jwk(self._public_key, as_dict=True)
         jwk_dict["kid"] = self._kid
