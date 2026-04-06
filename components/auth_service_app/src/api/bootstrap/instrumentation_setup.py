@@ -24,7 +24,17 @@ class InstrumentationSetup:
     @staticmethod
     def _get_sanitization_config():
         return InstrumentationSanitizationConfig(
-            sensitive_fields={"password", "token", "api_key", "ssn", "phone_number"}, max_field_length=64
+            sensitive_fields={
+                "password",
+                "token",
+                "secret",
+                "authorization",
+                "cookie",
+                "api_key",
+                "ssn",
+                "phone_number",
+            },
+            max_field_length=64,
         )
 
     @staticmethod

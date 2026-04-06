@@ -1,6 +1,7 @@
 # Auth Service
 
 - JWT-based authentication and RBAC service for microservices.
+- Uses [Token Validator](https://github.com/vyavasthita/token-validator) for RS256 JWT signing (JWKS) and token validation.
 - Uses [Instrumentation Hub](https://github.com/vyavasthita/instrumentation-hub) to push observability telemetry to [OAAS](https://github.com/vyavasthita/oaas).
 
 ---
@@ -11,8 +12,10 @@
 flowchart LR
     Client --> FastAPI[Auth Service API]
     FastAPI --> MySQL[(MySQL)]
+    FastAPI -.->|token-validator| JWKS[JWKS / RS256]
     FastAPI -.->|instrumentation-hub| Collector[OAAS OTel Collector]
     Collector --> Grafana[Grafana / Loki / Tempo / Prometheus]
+    Downstream[Downstream Services] -.->|JWKS endpoint| FastAPI
 ```
 
 ---
@@ -37,7 +40,7 @@ flowchart LR
    ```bash
    python -m uvicorn src.api:app --host 0.0.0.0 --port ${API_PORT} --reload
    ```
-8. Swagger UI: **http://localhost:5002/auth-service/docs**
+8. Swagger UI: **http://localhost:2002/auth-service/docs**
 
 > Ensure [OAAS](https://github.com/vyavasthita/oaas) is running first for observability.
 
@@ -55,7 +58,7 @@ flowchart LR
    make up
    ```
 
-Swagger UI: **http://localhost:5002/auth-service/docs**
+Swagger UI: **http://localhost:2002/auth-service/docs**
 
 ### `.env` Configuration
 
@@ -63,9 +66,9 @@ Swagger UI: **http://localhost:5002/auth-service/docs**
 |----------|---------|-------------|
 | `OBSERVABILITY_NETWORK_NAME` | `oaas-observability-net` | **Must match OAAS `.env`** |
 | `SERVICE_NAME` | `auth-service` | Service name (OTEL resource + API root path) |
-| `MYSQL_HOST_PORT` | `5001` | MySQL host port |
-| `API_PORT` | `5002` | Auth Service API port |
-| `PHPMYADMIN_HOST_PORT` | `5003` | phpMyAdmin port |
+| `MYSQL_HOST_PORT` | `2001` | MySQL host port |
+| `API_PORT` | `2002` | Auth Service API port |
+| `PHPMYADMIN_HOST_PORT` | `2003` | phpMyAdmin port |
 | `MYSQL_PORT` | `3306` | MySQL internal port (do not change) |
 
 ---
@@ -89,9 +92,9 @@ Swagger UI: **http://localhost:5002/auth-service/docs**
 
 | Service | URL | Variable |
 |---------|-----|----------|
-| Auth API | http://localhost:5002/auth-service/docs | `API_PORT` |
-| MySQL | localhost:5001 | `MYSQL_HOST_PORT` |
-| phpMyAdmin | http://localhost:5003 | `PHPMYADMIN_HOST_PORT` |
+| Auth API | http://localhost:2002/auth-service/docs | `API_PORT` |
+| MySQL | localhost:2001 | `MYSQL_HOST_PORT` |
+| phpMyAdmin | http://localhost:2003 | `PHPMYADMIN_HOST_PORT` |
 
 ---
 
@@ -100,8 +103,9 @@ Swagger UI: **http://localhost:5002/auth-service/docs**
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/register` | Register a new user |
-| `POST` | `/login` | Authenticate and get JWT |
+| `POST` | `/login` | Authenticate and get JWT (RS256) |
 | `POST` | `/validate` | Validate JWT token |
+| `GET` | `/token/.well-known/jwks.json` | JWKS public key endpoint |
 | `GET` | `/health` | Database connectivity check |
 | `POST` | `/roles` | Add a new role |
 | `GET` | `/users/me` | Get current user details |
@@ -128,6 +132,7 @@ Instrumented via [instrumentation-hub-fastapi](https://github.com/vyavasthita/in
 |------------|---------|
 | [OAAS](https://github.com/vyavasthita/oaas) | Observability stack (Grafana, Loki, Tempo, Prometheus) |
 | [Instrumentation Hub](https://github.com/vyavasthita/instrumentation-hub) | Client library for OpenTelemetry instrumentation |
+| [Token Validator](https://github.com/vyavasthita/token-validator) | RS256 JWT validation library with JWKS support |
 
 ---
 

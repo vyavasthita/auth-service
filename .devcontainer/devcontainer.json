@@ -21,11 +21,11 @@
   // Install dev dependencies inside the container after creation.
   "postCreateCommand": "pip install ruff pytest pytest-asyncio httpx",
 
-  "forwardPorts": [5002, 5001, 5003],
+  "forwardPorts": [2002, 2001, 2003],
   "portsAttributes": {
-    "5002": { "label": "Auth Service API", "onAutoForward": "notify" },
-    "5001": { "label": "MySQL", "onAutoForward": "silent" },
-    "5003": { "label": "phpMyAdmin", "onAutoForward": "silent" }
+    "2002": { "label": "Auth Service API", "onAutoForward": "notify" },
+    "2001": { "label": "MySQL", "onAutoForward": "silent" },
+    "2003": { "label": "phpMyAdmin", "onAutoForward": "silent" }
   },
 
   "customizations": {

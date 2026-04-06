@@ -17,4 +17,4 @@ class JWTSettings(BaseSettings):
     JWT_AUDIENCE: str = "auth-service"
 
     # JWKS host for token-validator (points to self for self-validation)
-    JWKS_HOST: str = "http://localhost:5002/auth-service"
+    JWKS_HOST: str = "http://localhost:2002/auth-service"

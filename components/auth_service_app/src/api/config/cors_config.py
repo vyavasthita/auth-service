@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 class CORSSettings(BaseSettings):
     """CORS settings."""
 
-    ALLOW_ORIGINS: str | None = "http://127.0.0.1:5001"
+    ALLOW_ORIGINS: str | None = "http://127.0.0.1:2001"
 
     @field_validator("ALLOW_ORIGINS")
     @classmethod
