@@ -5,8 +5,9 @@ from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.exceptions.db_exception import DBException, DBIntegrityException, DBOperationalException
-from src.api.repos.base.i_repository import ID, IRepository, T
 from src.utils.auth_service_logger import AuthServiceLogger
+
+from .i_repository import ID, IRepository, T
 
 
 class BaseRepository(IRepository[T, ID]):

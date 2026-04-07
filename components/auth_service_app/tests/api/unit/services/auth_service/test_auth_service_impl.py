@@ -29,9 +29,13 @@ async def test_login_success_returns_token():
     mock_session_repo = MagicMock()
     mock_session_repo.save = AsyncMock()
 
+    mock_user_repo = MagicMock()
+    mock_user_repo.find_roles_by_user_id = AsyncMock(return_value=["user"])
+
     service = AuthServiceImpl(
         auth_repository=mock_repo,
         session_repository=mock_session_repo,
+        user_repository=mock_user_repo,
         authenticator=MagicMock(),
     )
 

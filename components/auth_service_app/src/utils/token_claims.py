@@ -4,7 +4,6 @@ from uuid import uuid4
 from pydantic import BaseModel, Field
 
 from src.api.dependencies.config_dependency import Config
-from src.api.models import User
 
 
 class TokenClaims(BaseModel):
@@ -20,15 +19,17 @@ class TokenClaims(BaseModel):
     tokenType: str = Field(default="UserAuthToken", description="Token type")  # noqa: N815
     principalType: str = Field(default="USER", description="Principal type")  # noqa: N815
     connectionMethod: str = Field(default="UIDPWD", description="Connection method")  # noqa: N815
+    roles: list[str] = Field(default_factory=list, description="User roles")
 
     @classmethod
-    def for_user(cls, user: User) -> "TokenClaims":
+    def for_user(cls, username: str, user_roles: list[str]) -> "TokenClaims":
         """Factory: build claims from a User entity and config."""
         now = datetime.now(UTC)
         expire = now + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
 
         return cls(
-            sub=user.username,
+            sub=username,
+            roles=user_roles,
             exp=expire.timestamp(),
             iat=now.timestamp(),
             nbf=now.timestamp(),

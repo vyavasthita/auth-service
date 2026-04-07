@@ -1,0 +1,1 @@
+from .user_role_repository import IUserRoleRepository, UserRoleRepository

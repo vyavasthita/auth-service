@@ -5,9 +5,22 @@ from jwt_lib.authenticator import UserAuthenticator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import get_authenticator
-from src.api.models import SessionStatus, User
-from src.api.repos import AuthRepository, IAuthRepository, ISessionRepository, SessionRepository
+from src.api.exceptions.user_exception import FailToCreateUserException
+from src.api.models import Role, SessionStatus, User
+from src.api.repos import (
+    AuthRepository,
+    IAuthRepository,
+    IRoleRepository,
+    ISessionRepository,
+    IUserRepository,
+    IUserRoleRepository,
+    RoleRepository,
+    SessionRepository,
+    UserRepository,
+    UserRoleRepository,
+)
 from src.utils import JWTUtils, Security, TokenClaims
+from src.utils.auth_service_logger import AuthServiceLogger
 
 from .auth_decorators import is_active_token, is_new_user, is_valid_token, is_valid_user
 from .auth_service import AuthService
@@ -20,11 +33,18 @@ class AuthServiceImpl(AuthService):
         self,
         auth_repository: IAuthRepository = Depends(AuthRepository),
         session_repository: ISessionRepository = Depends(SessionRepository),
+        user_repository: IUserRepository = Depends(UserRepository),
+        role_repository: IRoleRepository = Depends(RoleRepository),
+        user_role_repository: IUserRoleRepository = Depends(UserRoleRepository),
         authenticator: UserAuthenticator = Depends(get_authenticator),
     ):
         super().__init__(auth_repository)
         self._session_repository = session_repository
+        self._user_repository = user_repository
+        self._role_repository = role_repository
+        self._user_role_repository = user_role_repository
         self._authenticator = authenticator
+        self._logger = AuthServiceLogger.get_logger()
 
     @property
     def session_repository(self) -> ISessionRepository:
@@ -33,6 +53,46 @@ class AuthServiceImpl(AuthService):
     @session_repository.setter
     def session_repository(self, session_repository: ISessionRepository) -> None:
         self._session_repository = session_repository
+
+    @property
+    def user_repository(self) -> IUserRepository:
+        return self._user_repository
+
+    @user_repository.setter
+    def user_repository(self, user_repository: IUserRepository) -> None:
+        self._user_repository = user_repository
+
+    @property
+    def role_repository(self) -> IRoleRepository:
+        return self._role_repository
+
+    @role_repository.setter
+    def role_repository(self, role_repository: IRoleRepository) -> None:
+        self._role_repository = role_repository
+
+    @property
+    def user_role_repository(self) -> IUserRoleRepository:
+        return self._user_role_repository
+
+    @user_role_repository.setter
+    def user_role_repository(self, user_role_repository: IUserRoleRepository) -> None:
+        self._user_role_repository = user_role_repository
+
+    @property
+    def authenticator(self) -> UserAuthenticator:
+        return self._authenticator
+
+    @authenticator.setter
+    def authenticator(self, authenticator: UserAuthenticator) -> None:
+        self._authenticator = authenticator
+
+    @property
+    def logger(self):
+        return self._logger
+
+    @logger.setter
+    def logger(self, logger):
+        self._logger = logger
 
     @is_new_user
     async def register(
@@ -49,7 +109,16 @@ class AuthServiceImpl(AuthService):
             username=username,
             password=Security.hash_password(password),
         )
+
+        role: Role = await self.role_repository.find_by_role_name(db_session, "user")
+
+        if role is None:
+            self.logger.error("Failed to create user: role 'user' not found.")
+            raise FailToCreateUserException("Failed to create user.")
+
         await self.auth_repository.save(db_session, user)
+
+        await self.user_role_repository.save(db_session, user_id, role.role_id)
 
         return user
 
@@ -63,7 +132,9 @@ class AuthServiceImpl(AuthService):
     ) -> tuple[str, bytes]:
         """Authenticate a user and return a JWT token and user_id."""
         user: User = kwargs["user"]
-        claims = TokenClaims.for_user(user)
+        user_roles: list[str] = await self.user_repository.find_roles_by_user_id(db_session, user.user_id)
+
+        claims = TokenClaims.for_user(username=user.username, user_roles=user_roles)
         token = JWTUtils.generate_auth_token(claims=claims.to_payload())
 
         await self.session_repository.save(db_session, token, claims.jti, SessionStatus.ACTIVE, user.user_id)

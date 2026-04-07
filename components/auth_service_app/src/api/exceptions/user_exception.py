@@ -27,3 +27,8 @@ class EmailFormatException(BaseException):
 class PhoneNumberAlreadyExistsException(BaseException):
     def __init__(self, phone_number: str):
         super().__init__(status.HTTP_409_CONFLICT, f"Phone number '{phone_number}' is already registered.")
+
+
+class FailToCreateUserException(BaseException):
+    def __init__(self, message: str):
+        super().__init__(status.HTTP_500_INTERNAL_SERVER_ERROR, message)

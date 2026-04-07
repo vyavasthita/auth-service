@@ -40,12 +40,14 @@ async def register(
 ) -> RegisterUserResponseDTO:
     """Register a new user."""
     logger.info(f"Register endpoint called for username: {request.username}")
+
     user: User = await auth_service.register(
         db_session=db_session,
         username=request.username,
         password=request.password,
     )
     logger.info(f"User registered: {user.username}")
+
     return RegisterUserResponseDTO(
         username=user.username,
     )

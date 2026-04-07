@@ -7,6 +7,7 @@ from .role_exception import RoleAlreadyExistsException
 from .token_exception import InvalidTokenException
 from .user_exception import (
     EmailFormatException,
+    FailToCreateUserException,
     InvalidCredentialsException,
     PhoneNumberAlreadyExistsException,
     UserAlreadyExistsException,
@@ -95,6 +96,16 @@ def register_exception_handlers(app: FastAPI):
     async def role_already_exists_exception_handler(
         request: Request,
         exc: RoleAlreadyExistsException,
+    ):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"message": exc.message},
+        )
+
+    @app.exception_handler(FailToCreateUserException)
+    async def fail_to_create_user_exception_handler(
+        request: Request,
+        exc: FailToCreateUserException,
     ):
         return JSONResponse(
             status_code=exc.status_code,

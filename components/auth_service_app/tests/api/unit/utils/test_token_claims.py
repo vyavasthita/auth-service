@@ -1,13 +1,8 @@
-from unittest.mock import MagicMock, patch
-
-from src.api.models import User
+from unittest.mock import patch
 
 
 def test_token_claims_for_user_contains_required_fields():
     """TokenClaims.for_user produces all fields needed by token-validator."""
-    mock_user = MagicMock(spec=User)
-    mock_user.username = "testuser"
-
     with patch("src.utils.token_claims.Config") as mock_config_cls:
         mock_config = mock_config_cls.return_value
         mock_config.TOKEN_EXPIRE_MINUTES = 10
@@ -16,7 +11,7 @@ def test_token_claims_for_user_contains_required_fields():
 
         from src.utils.token_claims import TokenClaims
 
-        claims = TokenClaims.for_user(mock_user)
+        claims = TokenClaims.for_user(username="testuser", user_roles=["user"])
 
     assert claims.sub == "testuser"
     assert claims.iss == "auth-service"
@@ -24,6 +19,7 @@ def test_token_claims_for_user_contains_required_fields():
     assert claims.tokenType == "UserAuthToken"
     assert claims.principalType == "USER"
     assert claims.connectionMethod == "UIDPWD"
+    assert claims.roles == ["user"]
     assert claims.jti  # non-empty
     assert claims.nbf <= claims.iat
     assert claims.exp > claims.iat
@@ -31,9 +27,6 @@ def test_token_claims_for_user_contains_required_fields():
 
 def test_token_claims_expiry_matches_config():
     """exp should be iat + TOKEN_EXPIRE_MINUTES."""
-    mock_user = MagicMock(spec=User)
-    mock_user.username = "testuser"
-
     with patch("src.utils.token_claims.Config") as mock_config_cls:
         mock_config = mock_config_cls.return_value
         mock_config.TOKEN_EXPIRE_MINUTES = 15
@@ -42,7 +35,7 @@ def test_token_claims_expiry_matches_config():
 
         from src.utils.token_claims import TokenClaims
 
-        claims = TokenClaims.for_user(mock_user)
+        claims = TokenClaims.for_user(username="testuser", user_roles=["user"])
 
     expected_delta = 15 * 60
     actual_delta = claims.exp - claims.iat
@@ -51,9 +44,6 @@ def test_token_claims_expiry_matches_config():
 
 def test_token_claims_to_payload_returns_dict():
     """to_payload returns a dict with all fields."""
-    mock_user = MagicMock(spec=User)
-    mock_user.username = "testuser"
-
     with patch("src.utils.token_claims.Config") as mock_config_cls:
         mock_config = mock_config_cls.return_value
         mock_config.TOKEN_EXPIRE_MINUTES = 10
@@ -62,20 +52,17 @@ def test_token_claims_to_payload_returns_dict():
 
         from src.utils.token_claims import TokenClaims
 
-        claims = TokenClaims.for_user(mock_user)
+        claims = TokenClaims.for_user(username="testuser", user_roles=["user"])
 
     payload = claims.to_payload()
 
     assert isinstance(payload, dict)
-    expected_keys = {"sub", "exp", "iat", "nbf", "jti", "iss", "aud", "tokenType", "principalType", "connectionMethod"}
+    expected_keys = {"sub", "exp", "iat", "nbf", "jti", "iss", "aud", "tokenType", "principalType", "connectionMethod", "roles"}
     assert expected_keys == set(payload.keys())
 
 
 def test_token_claims_jti_is_unique():
     """Each call to for_user generates a unique jti."""
-    mock_user = MagicMock(spec=User)
-    mock_user.username = "testuser"
-
     with patch("src.utils.token_claims.Config") as mock_config_cls:
         mock_config = mock_config_cls.return_value
         mock_config.TOKEN_EXPIRE_MINUTES = 10
@@ -84,7 +71,7 @@ def test_token_claims_jti_is_unique():
 
         from src.utils.token_claims import TokenClaims
 
-        claims1 = TokenClaims.for_user(mock_user)
-        claims2 = TokenClaims.for_user(mock_user)
+        claims1 = TokenClaims.for_user(username="testuser", user_roles=["user"])
+        claims2 = TokenClaims.for_user(username="testuser", user_roles=["user"])
 
     assert claims1.jti != claims2.jti
