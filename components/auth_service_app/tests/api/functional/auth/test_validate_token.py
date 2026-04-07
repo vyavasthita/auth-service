@@ -55,13 +55,14 @@ async def test_post_validate_token_valid(async_client: httpx.AsyncClient, test_c
                 return_value=mock_session,
             ),
         ):
+            async_client.cookies = cookies
             response = await async_client.post(
                 BASE_API_URL,
                 headers=namespace_to_dict(test_case.input.headers),
-                cookies=cookies,
                 params={"user_id": test_case.mock.user_id},
             )
     finally:
+        async_client.cookies.clear()
         app.dependency_overrides.pop(get_authenticator, None)
 
     assert response.status_code == test_case.output.status_code
@@ -93,13 +94,14 @@ async def test_post_validate_token_invalid(async_client: httpx.AsyncClient, test
     app.dependency_overrides[get_authenticator] = lambda: mock_authenticator
 
     try:
+        async_client.cookies = cookies
         response = await async_client.post(
             BASE_API_URL,
             headers=namespace_to_dict(test_case.input.headers),
-            cookies=cookies,
             params={"user_id": test_case.mock.user_id},
         )
     finally:
+        async_client.cookies.clear()
         app.dependency_overrides.pop(get_authenticator, None)
 
     assert response.status_code == test_case.output.status_code

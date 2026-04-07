@@ -29,7 +29,9 @@ def test_validate_token_valid(client, monkeypatch):
         "validate_token",
         AsyncMock(return_value=mock_user),
     )
-    response = client.post("/validate", cookies={"access_token": "validtoken"}, params={"user_id": str(test_uuid)})
+    client.cookies.set("access_token", "validtoken")
+    response = client.post("/validate", params={"user_id": str(test_uuid)})
+    client.cookies.clear()
     assert response.status_code == 200
     data = response.json()
     assert data["user_id"] == str(test_uuid)
@@ -47,7 +49,7 @@ def test_validate_token_invalid(client, monkeypatch):
         "validate_token",
         AsyncMock(side_effect=InvalidTokenException()),
     )
-    response = client.post(
-        "/validate", cookies={"access_token": "badtoken"}, params={"user_id": "12345678-1234-5678-1234-567812345678"}
-    )
+    client.cookies.set("access_token", "badtoken")
+    response = client.post("/validate", params={"user_id": "12345678-1234-5678-1234-567812345678"})
+    client.cookies.clear()
     assert response.status_code == 401

@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import UserRole
@@ -16,7 +14,6 @@ class UserRoleRepository(BaseRepository[UserRole, bytes], IUserRoleRepository):
 
     async def save(self, session: AsyncSession, user_id: bytes, role_id: bytes) -> UserRole:
         user_role = UserRole(
-            user_role_id=uuid4().bytes,
             user_id=user_id,
             role_id=role_id,
         )

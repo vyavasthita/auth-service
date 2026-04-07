@@ -57,7 +57,19 @@ def test_token_claims_to_payload_returns_dict():
     payload = claims.to_payload()
 
     assert isinstance(payload, dict)
-    expected_keys = {"sub", "exp", "iat", "nbf", "jti", "iss", "aud", "tokenType", "principalType", "connectionMethod", "roles"}
+    expected_keys = {
+        "sub",
+        "exp",
+        "iat",
+        "nbf",
+        "jti",
+        "iss",
+        "aud",
+        "tokenType",
+        "principalType",
+        "connectionMethod",
+        "roles",
+    }
     assert expected_keys == set(payload.keys())
 
 
