@@ -67,6 +67,7 @@ def is_valid_token(func):
         if user is None:
             raise UserNotFoundException(username=claims["sub"])
 
+        # pass user object to decorated function via kwargs for downstream use
         kwargs["user"] = user
 
         return await func(self, db_session, token, user_id, **kwargs)
