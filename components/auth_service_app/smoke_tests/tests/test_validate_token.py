@@ -41,4 +41,5 @@ async def test_validate_token_smoke(base_url, async_client):
     )
 
     data = validate_response.json()
-    assert data["username"] == shared_username
+    assert data["user_id"] == user_id
+    assert data["message"] == "Token is valid."

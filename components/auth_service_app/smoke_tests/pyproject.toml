@@ -1,19 +1,15 @@
-[project]
+[tool.poetry]
 name = "smoke-tests"
 version = "0.1.0"
 description = "Smoke tests for auth service"
-authors = [
-    {name = "diliplakshya@gmail.com"}
-]
-readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "pytest (>=9.0.2,<10.0.0)",
-    "httpx (>=0.28.1,<0.29.0)",
-    "fastapi (>=0.128.0,<0.129.0)",
-    "pytest-asyncio (>=1.3.0,<2.0.0)",
-    "requests (>=2.33.1,<3.0.0)"
-]
+authors = ["Dilip Sharma <diliplakshya@gmail.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.13,<3.14"
+pytest = "^9.0.2"
+httpx = "^0.28.1"
+pytest-asyncio = "^1.3.0"
 
 
 [build-system]
