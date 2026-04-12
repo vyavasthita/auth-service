@@ -27,7 +27,7 @@ async def test_is_valid_token_calls_authenticator_validate():
 
     mock_authenticator = MagicMock()
     mock_claims = MagicMock()
-    mock_claims.__getitem__ = MagicMock(side_effect=lambda k: "testuser" if k == "sub" else None)
+    mock_claims.__getitem__ = MagicMock(side_effect=lambda k: {"sub": "user-uuid-1", "username": "testuser"}[k])
     mock_authenticator.validate = AsyncMock(return_value=mock_claims)
 
     user = MagicMock(spec=User)
@@ -72,7 +72,7 @@ async def test_is_valid_token_raises_when_user_not_found():
 
     mock_authenticator = MagicMock()
     mock_claims = MagicMock()
-    mock_claims.__getitem__ = MagicMock(side_effect=lambda k: "ghost" if k == "sub" else None)
+    mock_claims.__getitem__ = MagicMock(side_effect=lambda k: {"sub": "user-uuid-2", "username": "ghost"}[k])
     mock_authenticator.validate = AsyncMock(return_value=mock_claims)
 
     svc = FakeService(authenticator=mock_authenticator, check_user_return=None)
@@ -92,8 +92,8 @@ async def test_is_valid_token_passes_user_in_kwargs():
 
     mock_authenticator = MagicMock()
     mock_claims = MagicMock()
-    mock_claims.__getitem__ = MagicMock(side_effect=lambda k: "alice" if k == "sub" else None)
-    mock_claims.__iter__ = MagicMock(return_value=iter({"sub": "alice"}))
+    mock_claims.__getitem__ = MagicMock(side_effect=lambda k: {"sub": "user-uuid-3", "username": "alice"}[k])
+    mock_claims.__iter__ = MagicMock(return_value=iter({"sub": "user-uuid-3", "username": "alice"}))
     mock_authenticator.validate = AsyncMock(return_value=mock_claims)
 
     user = MagicMock(spec=User)

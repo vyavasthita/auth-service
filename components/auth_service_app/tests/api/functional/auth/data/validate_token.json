@@ -14,7 +14,8 @@
         "user_id": "12345678-1234-5678-1234-567812345678",
         "username": "dilip_sharma",
         "claims": {
-          "sub": "dilip_sharma",
+          "sub": "12345678-1234-5678-1234-567812345678",
+          "username": "dilip_sharma",
           "exp": 9999999999
         }
       },
@@ -39,10 +40,7 @@
         "user_id": "12345678-1234-5678-1234-567812345678"
       },
       "output": {
-        "status_code": 401,
-        "body": {
-          "message": "Invalid or expired token."
-        }
+        "status_code": 422
       }
     }
   ],

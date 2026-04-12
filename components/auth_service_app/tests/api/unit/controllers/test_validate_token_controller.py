@@ -35,12 +35,11 @@ def test_validate_token_valid(client, monkeypatch):
     assert response.status_code == 200
     data = response.json()
     assert data["user_id"] == str(test_uuid)
-    assert data["username"] == "dilip_sharma"
 
 
 def test_validate_token_missing_cookie(client):
     response = client.post("/validate", params={"user_id": "12345678-1234-5678-1234-567812345678"})
-    assert response.status_code == 401
+    assert response.status_code == 422
 
 
 def test_validate_token_invalid(client, monkeypatch):

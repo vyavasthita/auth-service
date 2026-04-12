@@ -1,4 +1,4 @@
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import Depends
 from jwt_lib.authenticator import UserAuthenticator
@@ -134,25 +134,29 @@ class AuthServiceImpl(AuthService):
         user: User = kwargs["user"]
         user_roles: list[str] = await self.user_repository.find_roles_by_user_id(db_session, user.user_id)
 
-        claims = TokenClaims.for_user(username=user.username, user_roles=user_roles)
+        claims = TokenClaims.for_user(
+            user_id=str(UUID(bytes=user.user_id)),
+            username=user.username,
+            user_roles=user_roles,
+        )
         token = JWTUtils.generate_auth_token(claims=claims.to_payload())
 
         await self.session_repository.save(db_session, token, claims.jti, SessionStatus.ACTIVE, user.user_id)
 
         return token, user.user_id
 
-    @is_active_token
     @is_valid_token
+    @is_active_token
     async def validate_token(
         self,
         db_session: AsyncSession,
         token: str,
         user_id: bytes,
         **kwargs,
-    ) -> User:
+    ) -> User | None:
         """Validate a JWT token and return the user if valid."""
         user = kwargs.get("user")
-        self.logger.debug(f"validate_token got user: {user}")
+        self.logger.info(f"Token validation for '{user_id}' is successful.")
         return user
 
     async def logout(

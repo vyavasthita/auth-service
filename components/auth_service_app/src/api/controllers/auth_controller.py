@@ -13,7 +13,6 @@ from src.api.dtos import (
     RegisterUserResponseDTO,
     ValidateTokenResponseDTO,
 )
-from src.api.exceptions import InvalidTokenException
 from src.api.models import User
 from src.api.services import AuthService, AuthServiceImpl
 from src.utils import AuthServiceLogger
@@ -88,27 +87,22 @@ async def login(
 @auth_router.post(
     "/validate",
     response_model=ValidateTokenResponseDTO,
-    include_in_schema=False,
 )
 async def validate_token(
     user_id: str,
     db_session: AsyncSession = Depends(DatabaseDependency.get_db_session),
     auth_service: AuthService = Depends(AuthServiceImpl),
-    access_token: str | None = Cookie(default=None),
+    access_token: str = Cookie(),
 ) -> ValidateTokenResponseDTO:
     """Validate a JWT token from the cookie and return claims if valid."""
-    if not access_token:
-        raise InvalidTokenException()
-
-    user: User = await auth_service.validate_token(
+    await auth_service.validate_token(
         db_session=db_session,
         token=access_token,
         user_id=UUID(user_id).bytes,
     )
 
     return ValidateTokenResponseDTO(
-        user_id=str(UUID(bytes=user.user_id)),
-        username=user.username,
+        user_id=user_id,
         message="Token is valid.",
     )
 

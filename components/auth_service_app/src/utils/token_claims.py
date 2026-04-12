@@ -9,7 +9,8 @@ from src.api.dependencies.config_dependency import Config
 class TokenClaims(BaseModel):
     """Typed JWT claims — single source of truth for token payload."""
 
-    sub: str = Field(description="Subject (username)")
+    sub: str = Field(description="Subject (user ID)")
+    username: str = Field(description="Username")
     exp: float = Field(description="Expiration time (unix timestamp)")
     iat: float = Field(description="Issued at (unix timestamp)")
     nbf: float = Field(description="Not before (unix timestamp)")
@@ -22,13 +23,14 @@ class TokenClaims(BaseModel):
     roles: list[str] = Field(default_factory=list, description="User roles")
 
     @classmethod
-    def for_user(cls, username: str, user_roles: list[str]) -> "TokenClaims":
+    def for_user(cls, user_id: str, username: str, user_roles: list[str]) -> "TokenClaims":
         """Factory: build claims from a User entity and config."""
         now = datetime.now(UTC)
         expire = now + timedelta(minutes=Config().TOKEN_EXPIRE_MINUTES)
 
         return cls(
-            sub=username,
+            sub=user_id,
+            username=username,
             roles=user_roles,
             exp=expire.timestamp(),
             iat=now.timestamp(),

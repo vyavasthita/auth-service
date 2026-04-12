@@ -11,9 +11,10 @@ def test_token_claims_for_user_contains_required_fields():
 
         from src.utils.token_claims import TokenClaims
 
-        claims = TokenClaims.for_user(username="testuser", user_roles=["user"])
+        claims = TokenClaims.for_user(user_id="abc-123", username="testuser", user_roles=["user"])
 
-    assert claims.sub == "testuser"
+    assert claims.sub == "abc-123"
+    assert claims.username == "testuser"
     assert claims.iss == "auth-service"
     assert claims.aud == "auth-service"
     assert claims.tokenType == "UserAuthToken"
@@ -35,7 +36,7 @@ def test_token_claims_expiry_matches_config():
 
         from src.utils.token_claims import TokenClaims
 
-        claims = TokenClaims.for_user(username="testuser", user_roles=["user"])
+        claims = TokenClaims.for_user(user_id="abc-123", username="testuser", user_roles=["user"])
 
     expected_delta = 15 * 60
     actual_delta = claims.exp - claims.iat
@@ -52,13 +53,14 @@ def test_token_claims_to_payload_returns_dict():
 
         from src.utils.token_claims import TokenClaims
 
-        claims = TokenClaims.for_user(username="testuser", user_roles=["user"])
+        claims = TokenClaims.for_user(user_id="abc-123", username="testuser", user_roles=["user"])
 
     payload = claims.to_payload()
 
     assert isinstance(payload, dict)
     expected_keys = {
         "sub",
+        "username",
         "exp",
         "iat",
         "nbf",
@@ -83,7 +85,7 @@ def test_token_claims_jti_is_unique():
 
         from src.utils.token_claims import TokenClaims
 
-        claims1 = TokenClaims.for_user(username="testuser", user_roles=["user"])
-        claims2 = TokenClaims.for_user(username="testuser", user_roles=["user"])
+        claims1 = TokenClaims.for_user(user_id="abc-123", username="testuser", user_roles=["user"])
+        claims2 = TokenClaims.for_user(user_id="abc-123", username="testuser", user_roles=["user"])
 
     assert claims1.jti != claims2.jti

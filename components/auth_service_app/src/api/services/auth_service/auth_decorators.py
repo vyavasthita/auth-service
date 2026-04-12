@@ -9,7 +9,7 @@ from src.api.exceptions import (
     UserAlreadyExistsException,
     UserNotFoundException,
 )
-from src.api.models import SessionStatus
+from src.api.models import SessionStatus, UserSession
 from src.utils import Security
 
 
@@ -62,10 +62,10 @@ def is_valid_token(func):
             self.logger.debug(f"Token validation failed: {e}")
             raise InvalidTokenException() from e
 
-        user = await self._check_user(db_session, claims["sub"])
+        user = await self._check_user(db_session, claims["username"])
 
         if user is None:
-            raise UserNotFoundException(username=claims["sub"])
+            raise UserNotFoundException(username=claims["username"])
 
         # pass user object to decorated function via kwargs for downstream use
         kwargs["user"] = user
@@ -80,10 +80,10 @@ def is_active_token(func):
 
     @wraps(func)
     async def wrapper(self, db_session: AsyncSession, token: str, user_id: bytes, **kwargs):
-        session = await self.session_repository.find_by_user_and_token(db_session, user_id, token)
+        session: UserSession | None = await self.session_repository.find_by_user_and_token(db_session, user_id, token)
 
         if session is None or session.status != SessionStatus.ACTIVE:
-            self.logger.debug("Token session is not active.")
+            self.logger.info("Token session is not active.")
             raise InvalidTokenException()
 
         return await func(self, db_session, token, user_id, **kwargs)
