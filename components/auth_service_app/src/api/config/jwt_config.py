@@ -15,6 +15,3 @@ class JWTSettings(BaseSettings):
     # Token claims
     JWT_ISSUER: str = "auth-service"
     JWT_AUDIENCE: str = "auth-service"
-
-    # JWKS host for token-validator (points to self for self-validation)
-    JWKS_HOST: str = "http://localhost:2002/auth-service"

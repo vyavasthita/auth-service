@@ -42,7 +42,12 @@ def test_get_me_valid(client, monkeypatch):
 
     monkeypatch.setattr(
         AuthServiceImpl,
-        "validate_token",
+        "check_session_status",
+        AsyncMock(return_value=None),
+    )
+    monkeypatch.setattr(
+        AuthServiceImpl,
+        "get_user_by_id",
         AsyncMock(return_value=mock_user),
     )
     client.cookies.set("access_token", "validtoken")
@@ -63,7 +68,7 @@ def test_get_me_missing_cookie(client):
 def test_get_me_invalid_token(client, monkeypatch):
     monkeypatch.setattr(
         AuthServiceImpl,
-        "validate_token",
+        "check_session_status",
         AsyncMock(side_effect=InvalidTokenException()),
     )
     client.cookies.set("access_token", "badtoken")

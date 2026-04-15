@@ -11,7 +11,7 @@ from src.api.dtos import (
     LogoutRequestDTO,
     RegisterUserRequestDTO,
     RegisterUserResponseDTO,
-    ValidateTokenResponseDTO,
+    SessionStatusResponseDTO,
 )
 from src.api.models import User
 from src.api.services import AuthService, AuthServiceImpl
@@ -85,25 +85,25 @@ async def login(
 
 
 @auth_router.post(
-    "/validate",
-    response_model=ValidateTokenResponseDTO,
+    "/session-status",
+    response_model=SessionStatusResponseDTO,
 )
-async def validate_token(
+async def check_session_status(
     user_id: str,
     db_session: AsyncSession = Depends(DatabaseDependency.get_db_session),
     auth_service: AuthService = Depends(AuthServiceImpl),
     access_token: str = Cookie(),
-) -> ValidateTokenResponseDTO:
-    """Validate a JWT token from the cookie and return claims if valid."""
-    await auth_service.validate_token(
+) -> SessionStatusResponseDTO:
+    """Check if the token session is active and not revoked."""
+    await auth_service.check_session_status(
         db_session=db_session,
         token=access_token,
         user_id=UUID(user_id).bytes,
     )
 
-    return ValidateTokenResponseDTO(
+    return SessionStatusResponseDTO(
         user_id=user_id,
-        message="Token is valid.",
+        message="Session is active.",
     )
 
 

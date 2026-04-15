@@ -36,7 +36,6 @@ async def test_login_success_returns_token():
         auth_repository=mock_repo,
         session_repository=mock_session_repo,
         user_repository=mock_user_repo,
-        authenticator=MagicMock(),
     )
 
     with patch(
@@ -69,7 +68,6 @@ async def test_login_invalid_password_raises():
     service = AuthServiceImpl(
         auth_repository=mock_repo,
         session_repository=MagicMock(),
-        authenticator=MagicMock(),
     )
 
     with pytest.raises(InvalidCredentialsException):
@@ -88,7 +86,6 @@ async def test_login_user_not_found_raises():
     service = AuthServiceImpl(
         auth_repository=mock_repo,
         session_repository=MagicMock(),
-        authenticator=MagicMock(),
     )
 
     with pytest.raises(UserNotFoundException):

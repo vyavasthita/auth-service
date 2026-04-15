@@ -1,10 +1,9 @@
 from uuid import UUID, uuid4
 
 from fastapi import Depends
-from jwt_lib.authenticator import UserAuthenticator
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.dependencies import get_authenticator
+from src.api.exceptions.token_exception import InvalidTokenException
 from src.api.exceptions.user_exception import FailToCreateUserException
 from src.api.models import Role, SessionStatus, User
 from src.api.repos import (
@@ -22,7 +21,7 @@ from src.api.repos import (
 from src.utils import JWTUtils, Security, TokenClaims
 from src.utils.auth_service_logger import AuthServiceLogger
 
-from .auth_decorators import is_active_token, is_new_user, is_valid_token, is_valid_user
+from .auth_decorators import is_active_token, is_new_user, is_valid_user
 from .auth_service import AuthService
 
 
@@ -36,14 +35,12 @@ class AuthServiceImpl(AuthService):
         user_repository: IUserRepository = Depends(UserRepository),
         role_repository: IRoleRepository = Depends(RoleRepository),
         user_role_repository: IUserRoleRepository = Depends(UserRoleRepository),
-        authenticator: UserAuthenticator = Depends(get_authenticator),
     ):
         super().__init__(auth_repository)
         self._session_repository = session_repository
         self._user_repository = user_repository
         self._role_repository = role_repository
         self._user_role_repository = user_role_repository
-        self._authenticator = authenticator
         self._logger = AuthServiceLogger.get_logger()
 
     @property
@@ -77,14 +74,6 @@ class AuthServiceImpl(AuthService):
     @user_role_repository.setter
     def user_role_repository(self, user_role_repository: IUserRoleRepository) -> None:
         self._user_role_repository = user_role_repository
-
-    @property
-    def authenticator(self) -> UserAuthenticator:
-        return self._authenticator
-
-    @authenticator.setter
-    def authenticator(self, authenticator: UserAuthenticator) -> None:
-        self._authenticator = authenticator
 
     @property
     def logger(self):
@@ -145,18 +134,29 @@ class AuthServiceImpl(AuthService):
 
         return token, user.user_id
 
-    @is_valid_token
     @is_active_token
-    async def validate_token(
+    async def check_session_status(
         self,
         db_session: AsyncSession,
         token: str,
         user_id: bytes,
         **kwargs,
-    ) -> User | None:
-        """Validate a JWT token and return the user if valid."""
-        user = kwargs.get("user")
-        self.logger.info(f"Token validation for '{user_id}' is successful.")
+    ) -> None:
+        """Check if the token session is active."""
+        self.logger.info(f"Session status check for '{user_id}' is successful.")
+
+    async def get_user_by_id(
+        self,
+        db_session: AsyncSession,
+        user_id: bytes,
+    ) -> User:
+        """Look up a user by ID. Raises InvalidTokenException if not found."""
+        user = await self.user_repository.get_by_id(db_session, user_id)
+
+        if user is None:
+            self.logger.info(f"User not found for user_id '{user_id}'.")
+            raise InvalidTokenException()
+
         return user
 
     async def logout(

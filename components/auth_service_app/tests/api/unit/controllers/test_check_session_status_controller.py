@@ -18,7 +18,7 @@ def client():
     return TestClient(app)
 
 
-def test_validate_token_valid(client, monkeypatch):
+def test_check_session_status_active(client, monkeypatch):
     test_uuid = UUID("12345678-1234-5678-1234-567812345678")
     mock_user = MagicMock()
     mock_user.user_id = test_uuid.bytes
@@ -26,29 +26,29 @@ def test_validate_token_valid(client, monkeypatch):
 
     monkeypatch.setattr(
         AuthServiceImpl,
-        "validate_token",
+        "check_session_status",
         AsyncMock(return_value=mock_user),
     )
     client.cookies.set("access_token", "validtoken")
-    response = client.post("/validate", params={"user_id": str(test_uuid)})
+    response = client.post("/session-status", params={"user_id": str(test_uuid)})
     client.cookies.clear()
     assert response.status_code == 200
     data = response.json()
     assert data["user_id"] == str(test_uuid)
 
 
-def test_validate_token_missing_cookie(client):
-    response = client.post("/validate", params={"user_id": "12345678-1234-5678-1234-567812345678"})
+def test_check_session_status_missing_cookie(client):
+    response = client.post("/session-status", params={"user_id": "12345678-1234-5678-1234-567812345678"})
     assert response.status_code == 422
 
 
-def test_validate_token_invalid(client, monkeypatch):
+def test_check_session_status_inactive(client, monkeypatch):
     monkeypatch.setattr(
         AuthServiceImpl,
-        "validate_token",
+        "check_session_status",
         AsyncMock(side_effect=InvalidTokenException()),
     )
     client.cookies.set("access_token", "badtoken")
-    response = client.post("/validate", params={"user_id": "12345678-1234-5678-1234-567812345678"})
+    response = client.post("/session-status", params={"user_id": "12345678-1234-5678-1234-567812345678"})
     client.cookies.clear()
     assert response.status_code == 401

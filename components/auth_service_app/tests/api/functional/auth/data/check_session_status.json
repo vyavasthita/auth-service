@@ -1,7 +1,7 @@
 {
-  "valid_token_validation": [
+  "active_session": [
     {
-      "description": "Get user details with valid token",
+      "description": "Check session status for an active session",
       "input": {
         "headers": {
           "Content-Type": "application/json"
@@ -11,23 +11,16 @@
         }
       },
       "mock": {
-        "user_id": "12345678-1234-5678-1234-567812345678",
-        "username": "dilip_sharma",
-        "created_at": "2026-01-01 00:00:00"
+        "user_id": "12345678-1234-5678-1234-567812345678"
       },
       "output": {
-        "status_code": 200,
-        "body": {
-          "user_id": "12345678-1234-5678-1234-567812345678",
-          "username": "dilip_sharma",
-          "created_at": "2026-01-01 00:00:00"
-        }
+        "status_code": 200
       }
     }
   ],
-  "missing_cookie_validation": [
+  "missing_cookie": [
     {
-      "description": "Get user details without cookie",
+      "description": "Check session status without cookie",
       "input": {
         "headers": {
           "Content-Type": "application/json"
@@ -37,16 +30,13 @@
         "user_id": "12345678-1234-5678-1234-567812345678"
       },
       "output": {
-        "status_code": 401,
-        "body": {
-          "message": "Invalid or expired token."
-        }
+        "status_code": 422
       }
     }
   ],
   "inactive_session": [
     {
-      "description": "Get user details with inactive session",
+      "description": "Check session status for an inactive/revoked session",
       "input": {
         "headers": {
           "Content-Type": "application/json"
@@ -59,10 +49,7 @@
         "user_id": "12345678-1234-5678-1234-567812345678"
       },
       "output": {
-        "status_code": 401,
-        "body": {
-          "message": "Invalid or expired token."
-        }
+        "status_code": 401
       }
     }
   ]

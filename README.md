@@ -5,8 +5,7 @@
 
 ### Why Auth Service?
 
-- **RS256 + JWKS.** Tokens are signed with RSA keys and verified via a standard `/.well-known/jwks.json` endpoint — downstream services validate tokens without sharing secrets.
-- **Pluggable token validation.** Uses [Token Validator](https://github.com/vyavasthita/token-validator) for async JWT verification with JWKS caching, claim validation, and strategy pattern — the same library any consumer can use.
+- **RS256 + JWKS.** Tokens are signed with RSA keys and verified via a standard `/.well-known/jwks.json` endpoint — downstream services validate tokens locally using [Token Validator](https://github.com/vyavasthita/token-validator) without sharing secrets.
 - **Built-in observability.** Uses [Instrumentation Hub](https://github.com/vyavasthita/instrumentation-hub) to push logs, traces, and metrics to [OAAS](https://github.com/vyavasthita/oaas) — no observability code in the business logic.
 - **Clean architecture.** FastAPI dependency injection, generic repository pattern, Liquibase migrations, and configuration via Pydantic settings. Business logic is fully testable in isolation.
 - **Dev-ready in one click.** VS Code Dev Container boots MySQL, Liquibase, API, and phpMyAdmin automatically — no local tooling required.
@@ -15,10 +14,10 @@
 flowchart LR
     Client --> FastAPI[Auth Service API]
     FastAPI --> MySQL[(MySQL)]
-    FastAPI -.->|token-validator| JWKS[JWKS / RS256]
+    FastAPI -.->|JWKS endpoint| JWKS[RS256 Public Keys]
     FastAPI -.->|instrumentation-hub| Collector[OAAS OTel Collector]
     Collector --> Grafana[Grafana / Loki / Tempo / Prometheus]
-    Downstream[Downstream Services] -.->|JWKS endpoint| FastAPI
+    Downstream[Downstream Services] -.->|JWKS + token-validator| JWKS
 ```
 
 ---
@@ -102,7 +101,7 @@ Swagger UI: **http://localhost:<API_PORT>/auth-service/docs**
 |--------|------|-------------|
 | `POST` | `/register` | Register a new user |
 | `POST` | `/login` | Authenticate and get JWT (RS256) |
-| `POST` | `/validate` | Validate JWT token |
+| `POST` | `/session-status` | Check token session/revocation status |
 | `GET` | `/token/.well-known/jwks.json` | JWKS public key endpoint |
 | `GET` | `/health` | Database connectivity check |
 | `POST` | `/roles` | Add a new role |
@@ -130,7 +129,7 @@ Instrumented via [instrumentation-hub-fastapi](https://github.com/vyavasthita/in
 |------------|---------|
 | [OAAS](https://github.com/vyavasthita/oaas) | Observability stack (Grafana, Loki, Tempo, Prometheus) |
 | [Instrumentation Hub](https://github.com/vyavasthita/instrumentation-hub) | Client library for OpenTelemetry instrumentation |
-| [Token Validator](https://github.com/vyavasthita/token-validator) | RS256 JWT validation library with JWKS support |
+| [Token Validator](https://github.com/vyavasthita/token-validator) | RS256 JWT validation library with JWKS support (used by consumer services) |
 
 ---
 

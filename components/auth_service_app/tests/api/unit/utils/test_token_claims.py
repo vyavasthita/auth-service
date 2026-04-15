@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 
 def test_token_claims_for_user_contains_required_fields():
-    """TokenClaims.for_user produces all fields needed by token-validator."""
+    """TokenClaims.for_user produces all required JWT claim fields."""
     with patch("src.utils.token_claims.Config") as mock_config_cls:
         mock_config = mock_config_cls.return_value
         mock_config.TOKEN_EXPIRE_MINUTES = 10

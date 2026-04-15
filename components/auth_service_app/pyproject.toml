@@ -15,8 +15,7 @@ aiomysql = "^0.3.2"
 greenlet = "^3.0"
 email-validator = "^2.2.0"
 bcrypt = "^5.0.0"
-pyjwt = "^2.10.1"
-token-validator = { git = "https://github.com/vyavasthita/token-validator.git", rev = "main" }
+pyjwt = {version = "^2.10.1", extras = ["crypto"]}
 
 [tool.poetry.group.core.dependencies]
 fastapi = "^0.115.8"  # FastAPI web framework

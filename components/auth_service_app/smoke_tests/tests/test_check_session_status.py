@@ -2,12 +2,12 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def test_validate_token_smoke(base_url, async_client):
+async def test_check_session_status_smoke(base_url, async_client):
     register_url = f"{base_url}/register"
     login_url = f"{base_url}/login"
-    validate_url = f"{base_url}/validate"
+    session_status_url = f"{base_url}/session-status"
 
-    shared_username = "smoke_validate_user"
+    shared_username = "smoke_session_status_user"
     password = "smokepass123"
 
     register_payload = {
@@ -31,15 +31,15 @@ async def test_validate_token_smoke(base_url, async_client):
     token = login_response.cookies["access_token"]
     user_id = login_response.json()["user_id"]
 
-    validate_response = await async_client.post(
-        validate_url,
+    session_status_response = await async_client.post(
+        session_status_url,
         cookies={"access_token": token},
         params={"user_id": user_id},
     )
-    assert validate_response.status_code == 200, (
-        f"Validate token failed: {validate_response.status_code}"
+    assert session_status_response.status_code == 200, (
+        f"Session status check failed: {session_status_response.status_code}"
     )
 
-    data = validate_response.json()
+    data = session_status_response.json()
     assert data["user_id"] == user_id
-    assert data["message"] == "Token is valid."
+    assert data["message"] == "Session is active."

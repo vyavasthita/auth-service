@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class ValidateTokenRequestDTO(BaseModel):
+class SessionStatusRequestDTO(BaseModel):
     user_id: str
     token: str

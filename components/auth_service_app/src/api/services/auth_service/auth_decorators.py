@@ -1,6 +1,5 @@
 from functools import wraps
 
-from jwt_lib.exceptions import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.exceptions import (
@@ -44,33 +43,6 @@ def is_valid_user(func):
         kwargs["user"] = user
 
         return await func(self, db_session, username, password, **kwargs)
-
-    return wrapper
-
-
-def is_valid_token(func):
-    """Decorator to ensure the token is valid using token-validator library."""
-
-    @wraps(func)
-    async def wrapper(self, db_session: AsyncSession, token: str, user_id: bytes, **kwargs):
-        self.logger.debug("Validating token via UserAuthenticator.")
-
-        try:
-            claims = await self._authenticator.validate(token)
-            self.logger.debug(f"validate_token claims: {dict(claims)}")
-        except JWTError as e:
-            self.logger.debug(f"Token validation failed: {e}")
-            raise InvalidTokenException() from e
-
-        user = await self._check_user(db_session, claims["username"])
-
-        if user is None:
-            raise UserNotFoundException(username=claims["username"])
-
-        # pass user object to decorated function via kwargs for downstream use
-        kwargs["user"] = user
-
-        return await func(self, db_session, token, user_id, **kwargs)
 
     return wrapper
 

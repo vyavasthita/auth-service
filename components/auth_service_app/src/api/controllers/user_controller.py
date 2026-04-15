@@ -33,10 +33,17 @@ async def get_me(
     if not access_token:
         raise InvalidTokenException()
 
-    user: User = await auth_service.validate_token(
+    user_id_bytes = UUID(user_id).bytes
+
+    await auth_service.check_session_status(
         db_session=db_session,
         token=access_token,
-        user_id=UUID(user_id).bytes,
+        user_id=user_id_bytes,
+    )
+
+    user: User = await auth_service.get_user_by_id(
+        db_session=db_session,
+        user_id=user_id_bytes,
     )
 
     return UserMeResponseDTO(
