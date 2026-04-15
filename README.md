@@ -1,5 +1,14 @@
 # Auth Service
 
+<p align="left">
+  <img src="https://img.shields.io/badge/python-3.13-blue" alt="Python 3.13" />
+  <img src="https://img.shields.io/badge/framework-FastAPI-009688" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/auth-RS256%20%2B%20JWKS-orange" alt="RS256 + JWKS" />
+  <img src="https://img.shields.io/badge/database-MySQL%208-4479A1" alt="MySQL" />
+  <img src="https://img.shields.io/badge/observability-OpenTelemetry-blueviolet" alt="OpenTelemetry" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" />
+</p>
+
 - A **production-ready JWT authentication and RBAC service**
 - Issues RS256 tokens, exposes JWKS for zero-trust verification, and ships with full observability out of the box.
 
@@ -19,6 +28,19 @@ flowchart LR
     Collector --> Grafana[Grafana / Loki / Tempo / Prometheus]
     Downstream[Downstream Services] -.->|JWKS + token-validator| JWKS
 ```
+
+---
+
+## Skills Demonstrated
+
+- **Asymmetric JWT signing (RS256 + JWKS)** — tokens are signed with a private RSA key; consuming services verify via a public JWKS endpoint, eliminating shared secrets across the platform.
+- **Decorator-based authorization** — `@is_active_token` and `@is_new_user` decorators separate cross-cutting session/revocation checks from business logic, keeping service methods focused.
+- **Generic repository pattern** — a single async base repository handles CRUD for all SQLAlchemy models; adding a new entity requires zero boilerplate.
+- **Separation of concerns in token flow** — auth-service only validates sessions and revocation; JWT signature verification is delegated to consumer services via [token-validator](https://github.com/vyavasthita/token-validator), avoiding redundant self-validation.
+- **Infrastructure-as-code observability** — logs, traces, and metrics are injected via [instrumentation-hub](https://github.com/vyavasthita/instrumentation-hub) with zero observability code in business logic; backend routing (Loki vs OpenSearch, Tempo vs Jaeger) is controlled entirely by environment variables.
+- **Pydantic settings + environment-driven config** — all secrets, ports, and feature flags are loaded from environment variables with typed defaults, making the service 12-factor compliant.
+- **Liquibase schema migrations** — database changes are versioned YAML changesets applied automatically on container startup, supporting safe rollbacks.
+- **Comprehensive test strategy** — Automated tests across three layers: unit (isolated service/controller logic), functional (full FastAPI TestClient with mocked repos), and smoke tests (post-deploy HTTP validation against running containers).
 
 ---
 
@@ -133,6 +155,22 @@ Instrumented via [instrumentation-hub-fastapi](https://github.com/vyavasthita/in
 
 ---
 
+## Testing
+
+| Layer | Scope | Count |
+|-------|-------|-------|
+| Unit | Service logic, controllers, decorators, utilities | ~50 |
+| Functional | Full request cycle via FastAPI TestClient with mocked repositories | ~30 |
+| Smoke | Post-deploy HTTP tests against running Docker containers | ~7 |
+
+Run all tests:
+```bash
+make test      # unit + functional
+make smoke     # requires running containers
+```
+
+---
+
 ## License
 
-Copyright © 2026 Dilip Kumar Sharma. All rights reserved.
+[MIT](LICENSE) — Copyright © 2026 Dilip Kumar Sharma.
